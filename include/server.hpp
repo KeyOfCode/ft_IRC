@@ -6,7 +6,7 @@
 /*   By: paromero <paromero@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/10 08:59:25 by paromero          #+#    #+#             */
-/*   Updated: 2025/11/10 11:08:44 by paromero         ###   ########.fr       */
+/*   Updated: 2025/11/10 11:49:11 by paromero         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@
 #include <poll.h>
 #include <map>
 #include <stdlib.h>
+#include <netinet/in.h>
+#include <fcntl.h>
 
 class server
 {
@@ -25,7 +27,7 @@ class server
 		int port_;
 		std::string pswd_;
 		//! listeing socket
-		int listen_fd_;
+		int serSocket_;
 		//! signal bool
 		bool signal_;
 		//! poll management
