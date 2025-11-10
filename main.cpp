@@ -6,11 +6,13 @@
 /*   By: paromero <paromero@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/10 08:58:53 by paromero          #+#    #+#             */
-/*   Updated: 2025/11/10 11:00:55 by paromero         ###   ########.fr       */
+/*   Updated: 2025/11/10 12:12:04 by paromero         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "include/server.hpp"
+
+//TODO Comprobar si el puerto es valido o no
 
 int main (int ac, char **av) {
     if (ac != 3) {
@@ -18,6 +20,12 @@ int main (int ac, char **av) {
         return 1;
     }
     server sv(av);
-    sv.init();
+    try {
+        sv.init();
+        std::cout << "funciona" << std::endl;
+    }
+    catch (const std::exception& e) {
+        std::cout << "Error: " << e.what() << std::endl;
+    }
     return 0;
 }
