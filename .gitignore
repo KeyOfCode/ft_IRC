@@ -4,6 +4,7 @@
 # Compiled Object files
 *.slo
 *.lo
+/objs
 *.o
 *.obj
 
@@ -42,4 +43,4 @@
 
 # vscode
 .vscode
-irc
+ircserv
