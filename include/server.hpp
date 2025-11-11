@@ -6,7 +6,7 @@
 /*   By: paromero <paromero@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/10 08:59:25 by paromero          #+#    #+#             */
-/*   Updated: 2025/11/10 11:49:11 by paromero         ###   ########.fr       */
+/*   Updated: 2025/11/11 11:55:01 by paromero         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,6 @@ class server
 		void	add_fd_toPoll(int fd, short events);	//todo insert a poll to the struct and update poll_index
 		void	remove_fd_fromPoll(int fd);				//todo search the fd in poll_index and deletes from index and pollfd
 		void	handle_signal();						//todo handle the shutdown from a signal
-		void	set_nonblocking(int fd);				//todo set the socket to nonblocking
 		void	check_timeouts();						//todo checks every certain time for clients without activity and disconnect them
 		
 		

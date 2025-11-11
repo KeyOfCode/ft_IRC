@@ -6,7 +6,7 @@
 /*   By: pjimenez <pjimenez@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/10 10:39:51 by paromero          #+#    #+#             */
-/*   Updated: 2025/11/18 15:37:22 by pjimenez         ###   ########.fr       */
+/*   Updated: 2025/11/28 01:50:02 by pjimenez         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,9 +77,64 @@ void	server::init() {
 
 void	server::run() {
 	while (signal_ == false) {
-		if ((poll(&pollfds_[0], pollfds_.size(), -1) == -1 ) && signal_ == false)
-			throw std::runtime_error("Poll failed");
+		if (this->pollfds_.empty())
+			continue;
 		
+		int ret =  poll(&pollfds_[0], pollfds_.size(), -1);
+		if (ret == -1) {
+			if (errno == EINTR) { //! Interrumped by a signal, try again
+				if (signal_)
+					break;
+				continue;
+			}
+			else
+				throw std::runtime_error("Poll failed");
+		}
+
+		std::vector<std::pair<int, short> > ready; //! we keep the fd that has information ready
+		ready.reserve(ret);
+		for (size_t i = 0; i < pollfds_.size(); i++)
+		{
+			if (pollfds_[i].revents != 0)
+				ready.emplace_back(pollfds_[i].fd, pollfds_[i].revents);
+		}
 		
+		for (size_t i = 0; i < ready.size(); i++) {
+			int fd = ready[i].first;
+			short event = ready[i].second;
+			
+			if (event & (POLLERR | POLLHUP | POLLNVAL)) {
+				std::string reason = "Socket error";
+				std::cout << "close" << std::endl;
+				//close_client(fd, reason);
+				continue;
+			}
+			if ((event & POLLIN) && fd == this->serSocket_)
+			{
+				std::cout << "nuevo cliente" << std::endl;
+				//accept_new_clients();
+			}
+			
+			if (event & POLLIN)
+			{
+				std::cout << "nueva info" << std::endl;
+				//handle_read(fd);
+			}
+			
+			if (event & POLLOUT)
+			{
+				std::cout << "write" << std::endl;
+				//handle_write(fd);		
+			}
+			signal_ = true;
+		}
 	}
 }
+
+/*
+todo handle_read - recv en bucle manejar recv==0, EAGAIN, EINTR; volcar bytes a buffer
+todo handle_write - test mensaje debug (requiere persona B)
+todo close_clients(fd, reason) - cierra socket, borra de pollfds, logs, etc
+todo stop() - cierra clientes, socket de server y pollfds
+todo accept_new_clients
+*/
