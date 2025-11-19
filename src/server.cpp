@@ -6,23 +6,23 @@
 /*   By: pjimenez <pjimenez@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/10 10:39:51 by paromero          #+#    #+#             */
-/*   Updated: 2025/11/28 01:50:02 by pjimenez         ###   ########.fr       */
+/*   Updated: 2025/11/28 01:56:50 by pjimenez         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/server.hpp"
 
-server::server(char **av) {
+Server::Server(char **av) {
 	std::string port = av[1];
 	this->port_ = atoi(port.c_str());
 	this->pswd_ = av[2];
 	this->signal_ = false;
 }
 
-server::~server() {
+Server::~Server() {
 }
 
-server::server(const server& other) {
+Server::Server(const Server& other) {
 	this->port_ = other.port_;
 	this->pswd_ = other.pswd_;
 	this->serSocket_ = other.serSocket_;
@@ -33,7 +33,7 @@ server::server(const server& other) {
 	this->next_uid_ = other.next_uid_;
 }
 
-server& server::operator=(const server& other) {
+Server& Server::operator=(const Server& other) {
 	if (this != &other) {
         this->port_ = other.port_;
 		this->pswd_ = other.pswd_;
@@ -47,7 +47,7 @@ server& server::operator=(const server& other) {
 	return *this;
 }
 
-void	server::init() {
+void	Server::init() {
 	struct sockaddr_in add;
 	struct pollfd NewPoll;
 	
@@ -75,7 +75,7 @@ void	server::init() {
 	this->pollfds_.push_back(NewPoll);
 }
 
-void	server::run() {
+void	Server::run() {
 	while (signal_ == false) {
 		if (this->pollfds_.empty())
 			continue;
@@ -135,6 +135,6 @@ void	server::run() {
 todo handle_read - recv en bucle manejar recv==0, EAGAIN, EINTR; volcar bytes a buffer
 todo handle_write - test mensaje debug (requiere persona B)
 todo close_clients(fd, reason) - cierra socket, borra de pollfds, logs, etc
-todo stop() - cierra clientes, socket de server y pollfds
+todo stop() - cierra clientes, socket de Server y pollfds
 todo accept_new_clients
 */

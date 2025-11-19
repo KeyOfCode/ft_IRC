@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: paromero <paromero@student.42malaga.com    +#+  +:+       +#+        */
+/*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/10 08:59:25 by paromero          #+#    #+#             */
-/*   Updated: 2025/11/11 11:55:01 by paromero         ###   ########.fr       */
+/*   Updated: 2025/11/19 17:26:28 by darismen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 #include <netinet/in.h>
 #include <fcntl.h>
 
-class server
+class Server
 {
 	private:
 		//! start params
@@ -51,14 +51,14 @@ class server
 		
 		
 	public:
-		server(char **av);
-		~server();
-		server(const server& other);
-		server& operator=(const server& other);
+		Server(char **av);
+		~Server();
+		Server(const Server& other);
+		Server& operator=(const Server& other);
 		
 		void	init();											//todo init the viariables
 		void	run();											//todo main loop
-		void	stop();											//todo clean de server
+		void	stop();											//todo clean de Server
 		void	close_client(int fd, std::string &reason);		//todo close the client
 		
 };
