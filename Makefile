@@ -1,13 +1,13 @@
 RM = rm -f
 CC = c++
-CPPFLAGS = -Wall -Wextra -Werror -std=c++98
+CPPFLAGS = -Wall -Wextra -Werror 
 
 USER = paromero
 OBJ_DIR = objs
 OBJS = $(patsubst %.cpp, $(OBJ_DIR)/%.o, $(SRCS))
-SRCS = main.cpp src/server.cpp
+SRCS = main.cpp src/server.cpp src/client.cpp
 
-NAME = ircserv
+NAME = test_client
 
 GREEN = \033[1;32m
 RESET = \033[0m

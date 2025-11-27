@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: paromero <paromero@student.42malaga.com    +#+  +:+       +#+        */
+/*   By: pjimenez <pjimenez@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/10 10:39:51 by paromero          #+#    #+#             */
-/*   Updated: 2025/11/10 13:15:37 by paromero         ###   ########.fr       */
+/*   Updated: 2025/11/18 15:37:22 by pjimenez         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,7 @@ void	server::init() {
 }
 
 void	server::run() {
-	while (signal == false) {
+	while (signal_ == false) {
 		if ((poll(&pollfds_[0], pollfds_.size(), -1) == -1 ) && signal_ == false)
 			throw std::runtime_error("Poll failed");
 		
