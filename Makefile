@@ -5,7 +5,8 @@ CPPFLAGS = -Wall -Wextra -Werror
 USER = paromero
 OBJ_DIR = objs
 OBJS = $(patsubst %.cpp, $(OBJ_DIR)/%.o, $(SRCS))
-SRCS = main.cpp src/server.cpp src/client.cpp
+SRCS = main.cpp src/server.cpp src/client.cpp src/command.cpp src/parser.cpp
+HEADERS = include/server.hpp include/client.hpp include/command.hpp include/parser.hpp
 
 NAME = test_client
 
@@ -14,7 +15,7 @@ RESET = \033[0m
 
 all: $(OBJ_DIR) $(NAME)
 
-$(NAME): $(OBJS)
+$(NAME): $(OBJS) $(HEADERS)
 	@echo "$(GREEN)Compiling objects...$(RESET)"
 	@$(CC) $(CPPFLAGS) $(OBJS) -o $(NAME)
 	@echo "$(GREEN)Executable created: $(NAME)$(RESET)"
