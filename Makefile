@@ -5,7 +5,7 @@ CPPFLAGS = -Wall -Wextra -Werror
 USER = paromero
 OBJ_DIR = objs
 OBJS = $(patsubst %.cpp, $(OBJ_DIR)/%.o, $(SRCS))
-SRCS = main.cpp src/server.cpp src/client.cpp src/command.cpp src/parser.cpp
+SRCS = main.cpp src/server.cpp src/client.cpp
 HEADERS = include/server.hpp include/client.hpp include/command.hpp include/parser.hpp
 
 NAME = test_client

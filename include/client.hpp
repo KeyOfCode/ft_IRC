@@ -3,6 +3,7 @@
 
 #include <string>
 #include <set>
+#include <vector>
 #include <deque>
 #include <ctime>
 
@@ -12,7 +13,7 @@ typedef void (*NotifyFn)(int fd);
 struct IRCMessage {
     std::string prefix;
     std::string command;
-    std::deque<std::string> params;
+    std::vector<std::string> params;
     std::string trailing;
 };
 
@@ -47,7 +48,7 @@ public:
     void appendToRecvBuffer(const std::string& data);
 
     // procesa el Buffer y parsea líneas completas, llamando a onMessageParsed
-    void processBuffer(void (*onMessageParsed)(Client &, const IRCMessage&));
+    void processBuffer(void (*onMessageParsed)(Client &, std::string command, std::vector<std::string> params));
 
     //Mensaje recibido por el servidor.
     bool enqueueMessage(const std::string& raw);
@@ -91,7 +92,7 @@ private:
     bool pass_ok_;
     bool nick_ok_;
     bool user_ok_;
-    bool operator_;
+    // bool operator_;
 
     // identificadores
     std::string nickname_;

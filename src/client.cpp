@@ -11,7 +11,7 @@ Client::Client(int socket_fd)
     pass_ok_(false),
     nick_ok_(false),
     user_ok_(false),
-    operator_(false),
+    // operator_(false),
     nickname_(""),
     username_(""),
     hostname_(""),
@@ -125,7 +125,9 @@ IRCMessage Client::parseMessage(const std::string& line) {
     return msg;
 }
 
-void Client::processBuffer(void (*onMessageParsed)(Client &, const IRCMessage&)) {
+
+//onMesseageParsed --> Client, msg.command, msg.params
+void Client::processBuffer(void (*onMessageParsed)(Client &, std::string command, std::vector<std::string> params)) {
     const size_t IRC_MAX = IRC_LINE_MAX;
 
     while (true) {
@@ -168,7 +170,7 @@ void Client::processBuffer(void (*onMessageParsed)(Client &, const IRCMessage&))
         //LO QUE LE PASE AL MENSAJE PARSEADO
         IRCMessage msg = parseMessage(line);
         if (onMessageParsed && !disconnected_) {
-            onMessageParsed(*this, msg);
+            onMessageParsed(*this, msg.command,msg.params);
         }
 
         updateLastActivity();
