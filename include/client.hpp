@@ -7,6 +7,10 @@
 #include <vector>
 #include <ctime>
 
+// Forward declarations
+class Parser;
+class Server;
+
 struct IRCMessage {
     std::string prefix;
     std::string command;
@@ -26,6 +30,7 @@ public:
     const std::string& getUsername() const;
     const std::string& getHostname() const;
     const std::string& getRecvBuffer() const;
+    bool getPass();
     time_t getLastActivity() const;
     const std::set<std::string>& getChannels() const;
     bool isDisconnected() const;
@@ -45,8 +50,7 @@ public:
     void appendToRecvBuffer(const std::string& data);
 
     // procesa el Buffer y parsea líneas completas, llamando a onMessageParsed
-    void processBuffer(void (*onMessageParsed)(Client &, const IRCMessage&));
-
+    void processBuffer(Server *srv ,Parser* parser,void (*onMessageParsed)(Server *srv,Parser *parser,Client *, std::string command, std::vector<std::string> params));
     //Mensaje recibido por el servidor.
     bool enqueueMessage(const std::string& raw);
 

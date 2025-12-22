@@ -40,6 +40,8 @@ Parser::~Parser()
 	_commands.clear();
 }
 
+const std::map<std::string, Command *>& Parser::getCommands() const { return _commands; }
+
 /* std::string     Parser::trim(const std::string& str)
 {
 	
@@ -48,11 +50,13 @@ Parser::~Parser()
 //:Nickname!Username@Servername Cualquier cosa
 //:Nickname!Username@Servername CMD <params>
 
-void	Parser::invoke(Client* client, const std::string& command, const std::vector<std::string>& params)
+void	invoke(Server *srv, Parser *prs, Client* client, std::string command, std::vector<std::string> params)
 {
-		Command *cmd = _commands.at(command);
-		if (cmd == NULL)
-			return void(_srv->sendResponse("Unknown Command", client->getSocketFd()));
-
+		const std::map<std::string, Command*>& commands = prs->getCommands();
+		std::map<std::string, Command*>::const_iterator it = commands.find(command);
+		if (it == commands.end())
+			return void(srv->sendResponse("421 " + client->getNickname() + " " + command + " :Unknown command\r\n", client->getSocketFd()));
+		
+		Command *cmd = it->second;
 		cmd->execute(client, params);
 }

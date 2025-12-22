@@ -6,7 +6,7 @@
 /*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/08 18:39:34 by darismen          #+#    #+#             */
-/*   Updated: 2025/12/19 16:39:41 by darismen         ###   ########.fr       */
+/*   Updated: 2025/12/22 13:48:12 by darismen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,14 +20,18 @@
 #include <time.h>
 
 
+#define CLIENT_PREFIX(client) (client->getNickname() + "!" + client->getUsername() + "@" + client->getHostname())
+
 /* Numeric Responses */
 
 #define RPL_WELCOME(source)								"001 " + source + " :Welcome " + source + " to the ft_irc network"
 #define RPL_NAMREPLY(source, channel, users)            "353 " + source + " = " + channel + " :" + users
 #define RPL_ENDOFNAMES(source, channel)                 "366 " + source + " " + channel + " :End of /NAMES list."
 
-/* Command Responses */
+//CMD_JOIN,        // :<nick>!<user>@<host> JOIN #channel
 
+/* Command Responses */
+/* 
 #define RPL_JOIN(source, channel)                       ":" + source + " JOIN :" + channel
 #define RPL_PART(source, channel)                       ":" + source + " PART :" + channel
 #define RPL_PING(source, token)                         ":" + source + " PONG :" + token
@@ -36,7 +40,15 @@
 #define RPL_QUIT(source, message)                       ":" + source + " QUIT :Quit: " + message
 #define RPL_KICK(source, channel, target, reason)       ":" + source + " KICK " + channel + " " + target + " :" + reason
 #define RPL_MODE(source, channel, modes, args)          ":" + source + " MODE " + channel + " " + modes + " " + args
-
+ */
+#define RPL_JOIN(client, channel)                       ":" + CLIENT_PREFIX(client) + " JOIN :" + channel
+#define RPL_PART(client, channel)                       ":" + CLIENT_PREFIX(client) + " PART :" + channel
+#define RPL_PRIVMSG(client, target, message)            ":" + CLIENT_PREFIX(client) + " PRIVMSG " + target + " :" + message
+#define RPL_QUIT(client, message)                       ":" + CLIENT_PREFIX(client) + " QUIT : " + message
+#define RPL_KICK(client, channel, target, reason)       ":" + CLIENT_PREFIX(client) + " KICK " + channel + " " + target + " :" + reason
+#define RPL_MODE(client, channel, modes, args)          ":" + CLIENT_PREFIX(client) + " MODE " + channel + " " + modes + " " + args
+#define RPL_PING(client, token)                         ":" + CLIENT_PREFIX(client) + " PONG :" + token
+#define RPL_NOTICE(client, target, message)             ":" + CLIENT_PREFIX(client) + " NOTICE " + target + " :" + message
 /* Error Responses */
 
 #define ERR_NOTREGISTERED(source)                       "451 " + source + " :You have not registered"
@@ -71,4 +83,3 @@ static inline void log(const std::string& message)
 	strftime(buffer, sizeof(buffer), "%d-%m-%Y %H:%M:%S", timeinfo);
 	std::cout << "\033[0;34m[" << buffer << "]\033[0m " << message << std::endl;
 }
-

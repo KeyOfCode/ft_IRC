@@ -11,6 +11,8 @@
 /* ************************************************************************** */
 
 #include "../include/Channel.hpp"
+#include "../include/Server.hpp"
+#include "../include/client.hpp"
 
 Channel::Channel(const std::string &name, const std::string &key, Client* admin, Server *srv) :
 	_name(name),

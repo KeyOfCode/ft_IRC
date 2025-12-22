@@ -1,4 +1,6 @@
 #include "../include/client.hpp"
+#include "../include/parser.hpp"
+#include "../include/Server.hpp"
 #include <unistd.h>     // close(), write()
 #include <algorithm>    // std::min
 #include <cstring>
@@ -41,6 +43,7 @@ const std::string& Client::getNickname() const { return nickname_; }
 const std::string& Client::getUsername() const { return username_; }
 const std::string& Client::getHostname() const { return hostname_; }
 const std::string& Client::getRecvBuffer() const { return recv_buffer_; }
+bool Client::getPass(){ return pass_ok_; }
 time_t Client::getLastActivity() const { return last_activity_; }
 const std::set<std::string>& Client::getChannels() const { return channels_; }
 bool Client::isDisconnected() const { return disconnected_; }
@@ -122,7 +125,7 @@ IRCMessage Client::parseMessage(const std::string& line) {
     return msg;
 }
 
-void Client::processBuffer(void (*onMessageParsed)(Client &, const IRCMessage&)) {
+void Client::processBuffer(Server *srv,Parser* parser,void (*onMessageParsed)(Server *srv, Parser* parser,Client *, std::string command, std::vector<std::string> params)) {
     const size_t IRC_MAX = IRC_LINE_MAX;
 
     while (true) {
@@ -164,13 +167,12 @@ void Client::processBuffer(void (*onMessageParsed)(Client &, const IRCMessage&))
         //LO QUE LE PASE AL MENSAJE PARSEADO
         IRCMessage msg = parseMessage(line);
         if (onMessageParsed && !disconnected_) {
-            onMessageParsed(*this, msg);
+            onMessageParsed(srv,parser,this, msg.command,msg.params);
         }
 
         updateLastActivity();
     }
 }
-
 // =========================== Send queue =====================
 
 void Client::pushSendQueue(const std::string& msg) {

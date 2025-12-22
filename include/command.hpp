@@ -15,13 +15,13 @@
 #include <numeric>
 #include <string>
 #include <algorithm>
+#include <vector>
 
-#include "Server.hpp"
-#include "client.hpp"
-#include "Channel.hpp"
 #include "response.hpp"
 
 class Server;
+class Client;
+class Channel;
 
 class Command
 {

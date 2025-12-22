@@ -92,15 +92,21 @@ void	Server::sendResponse(const std::string& response, int fd)
 {
 	Client* client = getclient(fd);
 	if (!client) {
-		std::cerr << "sendREsponse: client fd " << fd << " not found" << std::endl;
+		std::cerr << "sendResponse: client fd " << fd << " not found" << std::endl;
 		return;
 	}
-	client->enqueueMessage(response);
-	int idx = find_poll_index(fd);
-	if (idx != -1)
-		pollfds_[idx].events |= POLLOUT;
+	std::string msg = response;
+	// Only add \r\n if not already present
+	if (msg.size() < 2 || msg.substr(msg.size() - 2) != "\r\n")
+		msg += "\r\n";
+	
+	ssize_t sent = send(fd, msg.c_str(), msg.length(), 0);
+	if (sent == -1) {
+		std::cerr << "Send error for fd " << fd << ": " << strerror(errno) << std::endl;
+	} else {
+		std::cout << "Sent " << sent << " bytes to fd " << fd << ": " << msg;
+	}
 }
-
 std::string	Server::getpassword() {
 	return this->pswd_;
 }
@@ -246,70 +252,70 @@ void	Server::accept_new_clients() {
 } */
 
 //MARK: parseMEssage
-IRCMessage parseMessage(std::string line)
-{
-	IRCMessage msg;
-	size_t start = 0;
+// IRCMessage parseMessage(std::string line)
+// {
+// 	IRCMessage msg;
+// 	size_t start = 0;
 
-	// Remove \r\n
-	if (line.size() >= 2 && line[line.size() - 2] == '\r')
-		line = line.substr(0, line.size() - 2);
+// 	// Remove \r\n
+// 	if (line.size() >= 2 && line[line.size() - 2] == '\r')
+// 		line = line.substr(0, line.size() - 2);
 	
-	// Parse prefix (if starts with :)
-	if (!line.empty() && line[0] == ':')
-	{
-		size_t space = line.find(' ');
-		if (space != std::string::npos)
-		{
-			msg.prefix = line.substr(1, space - 1);
-			start = space + 1;
-		}
-	}
+// 	// Parse prefix (if starts with :)
+// 	if (!line.empty() && line[0] == ':')
+// 	{
+// 		size_t space = line.find(' ');
+// 		if (space != std::string::npos)
+// 		{
+// 			msg.prefix = line.substr(1, space - 1);
+// 			start = space + 1;
+// 		}
+// 	}
 	
-	// Handle / prefix for commands
-	if (start < line.size() && line[start] == '/')
-		start++;  // Skip the /
+// 	// Handle / prefix for commands
+// 	if (start < line.size() && line[start] == '/')
+// 		start++;  // Skip the /
 		
-	// Parse command
-	size_t space = line.find(' ', start);
-	// line = line.substr(start+1);
-	if (space != std::string::npos)
-	{
-		msg.command = line.substr(start, space - start);
-		std::transform(msg.command.begin(), msg.command.end(), msg.command.begin(), ::toupper);
-		start = space + 1;
-	}
-	else
-	{
-		msg.command = line.substr(start);
-		std::transform(msg.command.begin(), msg.command.end(), msg.command.begin(), ::toupper);
-		return msg;  // No params
-	}
+// 	// Parse command
+// 	size_t space = line.find(' ', start);
+// 	// line = line.substr(start+1);
+// 	if (space != std::string::npos)
+// 	{
+// 		msg.command = line.substr(start, space - start);
+// 		std::transform(msg.command.begin(), msg.command.end(), msg.command.begin(), ::toupper);
+// 		start = space + 1;
+// 	}
+// 	else
+// 	{
+// 		msg.command = line.substr(start);
+// 		std::transform(msg.command.begin(), msg.command.end(), msg.command.begin(), ::toupper);
+// 		return msg;  // No params
+// 	}
 	
-	// Parse params and trailing
-	while (start < line.size())
-	{
-		if (line[start] == ':')
-		{
-			msg.trailing = line.substr(start + 1);
-			break;
-		}
+// 	// Parse params and trailing
+// 	while (start < line.size())
+// 	{
+// 		if (line[start] == ':')
+// 		{
+// 			msg.trailing = line.substr(start + 1);
+// 			break;
+// 		}
 		
-		space = line.find(' ', start);
-		if (space != std::string::npos)
-		{
-			msg.params.push_back(line.substr(start, space - start));
-			start = space + 1;
-		}
-		else
-		{
-			msg.params.push_back(line.substr(start));
-			break;
-		}
-	}
+// 		space = line.find(' ', start);
+// 		if (space != std::string::npos)
+// 		{
+// 			msg.params.push_back(line.substr(start, space - start));
+// 			start = space + 1;
+// 		}
+// 		else
+// 		{
+// 			msg.params.push_back(line.substr(start));
+// 			break;
+// 		}
+// 	}
 	
-	return msg;	
-}
+// 	return msg;	
+// }
 
 //MARK: handle_read
 void	Server::handle_read(int fd) {
@@ -336,19 +342,36 @@ void	Server::handle_read(int fd) {
 	std::string data(buffer, n);
 	std::cout << "Received " << n << " bytes from fd " << fd << std::endl;
 	
-	IRCMessage msg = parseMessage(data);
-	std::cout <<"command: "<< msg.command;
-	if (!msg.params.empty())
-	{
-		std::cout << " params: ";
-		for (size_t i = 0; i < msg.params.size(); i++)
-			std::cout << msg.params[i] << " ";
+	client->appendToRecvBuffer(data);
+	//! password management
+	if (!client->getPass()) {	
+		if (client->getRecvBuffer().find("PASS") != std::string::npos) {
+			std::string line = client->getRecvBuffer();
+			size_t firstpos = line.find("PASS") + 5; //! We pass the word PASS and the space to focus in the password
+			size_t finalpos = line.find('\r', firstpos);
+			
+			if (finalpos == std::string::npos)
+			return;
+			finalpos = finalpos - firstpos;
+			std::string password = line.substr(firstpos, finalpos);
+			if (password != this->pswd_) {
+				close_client(fd, "Wrong password");
+				return;
+			}
+			else {
+				client->setPassOK();
+				client->popRecv(finalpos + 2);
+			}
+		}
 	}
-	std::cout << std::endl;
-	parser_->invoke(client, msg.command, msg.params);
+	
+	std::cout << "Message from client: " << client->getRecvBuffer() << std::endl;
+	std::cout << "returned recv: " << n << std::endl;
+	client->processBuffer(this,parser_,invoke);
 
-	// std::cout << "returned recv: " << n << std::endl;
-	// std::cout << "Message from client: " << buffer << std::endl;
+	
+
+
 	
 	//! hay clientes que pasan de primera info (irssi: CAP LS, NICK, USER, etc) y otros que no pasan nada (netcat, alias nc)
 }

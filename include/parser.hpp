@@ -36,6 +36,7 @@ class Parser
 	public:
 		Parser(Server* srv);
 		~Parser();
+		const std::map<std::string, Command *>& getCommands() const;
 
-		void	invoke(Client* client, const std::string& command, const std::vector<std::string>& params);
-};
+	};
+	void	invoke(Server *srv, Parser *prs, Client* client, std::string command, std::vector<std::string> params);

@@ -13,12 +13,14 @@
 #pragma once
 
 #include <algorithm>
+#include <string>
+#include <vector>
+#include <map>
 
-#include "Server.hpp"
-#include "client.hpp"
 #include "response.hpp"
 
 class Server;
+class Client;
 
 
 class Channel

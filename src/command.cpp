@@ -3,16 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   command.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pjimenez <pjimenez@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/08 18:32:33 by darismen          #+#    #+#             */
-/*   Updated: 2025/12/19 18:43:19 by darismen         ###   ########.fr       */
+/*   Updated: 2025/12/12 18:51:25 by pjimenez         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/command.hpp"
+#include "../include/Channel.hpp"
+#include "../include/client.hpp"
+#include "../include/Server.hpp"
+#include "../include/response.hpp"
 
-//MARK: Cap
 void Cap::execute(Client* client, std::vector<std::string> args)
 {
 	if (args.empty())
@@ -182,6 +185,7 @@ void	Join::execute(Client* client, std::vector<std::string> args)
 	}
 	channel->add_client(client);
 	client->joinChannel(tgt_channel);
+	_srv->sendResponse(RPL_JOIN(client, tgt_channel), client->getSocketFd());
 }
 
 //MARK: PART
@@ -256,7 +260,7 @@ void	PrivMsg::execute(Client* client, std::vector<std::string> args)
 	if (!dest)
 		return void(_srv->sendResponse(ERR_NOSUCHNICK(client->getNickname(), target), client->getSocketFd()));
 	
-	_srv->sendResponse(RPL_PRIVMSG(client->getNickname(), target, message), dest->getSocketFd());
+	_srv->sendResponse(RPL_PRIVMSG(client, target, message), dest->getSocketFd());
 }
 
 //MARK: Notice
@@ -290,7 +294,7 @@ void	Notice::execute(Client* client, std::vector<std::string> args)
 	if (!channel)
 	return void(_srv->sendResponse(ERR_NOSUCHCHANNEL(client->getNickname(), tgt_channel), client->getSocketFd()));
 
-	channel->broadcast(RPL_NOTICE(client->getNickname(), tgt_channel, message));
+	channel->broadcast(RPL_NOTICE(client, tgt_channel, message));
 }
 
 //MARK: PING
@@ -300,7 +304,7 @@ void	Ping::execute(Client* client, std::vector<std::string> args)
 	if (args.size() < 1)
 		return void(_srv->sendResponse(ERR_NEEDMOREPARAMS(client->getNickname(), "Ping"), client->getSocketFd()));
 	
-	_srv->sendResponse(RPL_PING(client->getNickname(), args[0]), client->getSocketFd());
+	_srv->sendResponse(RPL_PING(client, args[0]), client->getSocketFd());
 }
 
 //MARK: PONG
@@ -310,5 +314,5 @@ void	Pong::execute(Client* client, std::vector<std::string> args)
 	if (args.size() < 1)
 		return void(_srv->sendResponse(ERR_NEEDMOREPARAMS(client->getNickname(), "Pong"), client->getSocketFd()));
 	
-	_srv->sendResponse(RPL_PING(client->getNickname(), args[0]), client->getSocketFd());
+	_srv->sendResponse(RPL_PING(client, args[0]), client->getSocketFd());
 }
