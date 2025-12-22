@@ -6,7 +6,7 @@
 /*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/19 16:26:28 by darismen          #+#    #+#             */
-/*   Updated: 2025/11/19 17:26:28 by darismen         ###   ########.fr       */
+/*   Updated: 2025/12/17 19:30:41 by darismen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,10 @@
 #include <map>
 
 #include "command.hpp"
+#include "Server.hpp"
+
+class Server;
+class Command;
 
 class Parser
 {
@@ -33,5 +37,5 @@ class Parser
 		Parser(Server* srv);
 		~Parser();
 
-		void    invoke(Client* client, const std::string& message);
+		void	invoke(Client* client, const std::string& command, const std::vector<std::string>& params);
 };

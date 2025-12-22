@@ -3,12 +3,9 @@
 
 #include <string>
 #include <set>
-#include <vector>
 #include <deque>
+#include <vector>
 #include <ctime>
-
-// Tipo de callback: notificar al core del servidor (Persona A) o similar
-typedef void (*NotifyFn)(int fd);
 
 struct IRCMessage {
     std::string prefix;
@@ -48,7 +45,7 @@ public:
     void appendToRecvBuffer(const std::string& data);
 
     // procesa el Buffer y parsea líneas completas, llamando a onMessageParsed
-    void processBuffer(void (*onMessageParsed)(Client &, std::string command, std::vector<std::string> params));
+    void processBuffer(void (*onMessageParsed)(Client &, const IRCMessage&));
 
     //Mensaje recibido por el servidor.
     bool enqueueMessage(const std::string& raw);
@@ -82,8 +79,6 @@ public:
 
     // Manejo de desconexión
     void handleDisconnect(); // cierra y notifica
-    void setDisconnectNotify(NotifyFn f); // callback para avisar a A
-    void setWriteNotify(NotifyFn f);      // callback para avisar a A que desea escribir
 
 private:
     int socket_fd_;
@@ -114,9 +109,6 @@ private:
     // flag de desconexión
     bool disconnected_;
 
-    // Callbacks para notificar a A
-    NotifyFn disconnectNotify_;
-    NotifyFn writeNotify_;
 
     // Limits
     static const size_t IRC_LINE_MAX = 512;
@@ -126,7 +118,7 @@ private:
     static IRCMessage parseMessage(const std::string& line);
 
     
-    void pushSendQueueAndNotify(const std::string& msg);
+    void pushSendQueue(const std::string& msg);
 };
 
 #endif // CLIENT_HPP

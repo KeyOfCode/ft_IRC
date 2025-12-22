@@ -21,9 +21,7 @@ Client::Client(int socket_fd)
     send_offset_(0),
     channels_(),
     last_activity_(std::time(0)),
-    disconnected_(false),
-    disconnectNotify_(0),
-    writeNotify_(0)
+    disconnected_(false)
 {
 }
 
@@ -63,9 +61,8 @@ bool Client::isFullyRegistered() const { return pass_ok_ && nick_ok_ && user_ok_
 void Client::appendToRecvBuffer(const std::string& data)
 {
     if (recv_buffer_.size() + data.size() > RECV_BUFFER_LIMIT) {
-        pushSendQueueAndNotify("ERROR :Recv buffer limit exceeded\r\n");
+        pushSendQueue("ERROR :Recv buffer limit exceeded\r\n");
         disconnected_ = true;
-        if (disconnectNotify_) disconnectNotify_(socket_fd_);
         return;
     }
     recv_buffer_ += data;
@@ -125,26 +122,23 @@ IRCMessage Client::parseMessage(const std::string& line) {
     return msg;
 }
 
-
-//onMesseageParsed --> Client, msg.command, msg.params
-void Client::processBuffer(void (*onMessageParsed)(Client &, std::string command, std::vector<std::string> params)) {
+void Client::processBuffer(void (*onMessageParsed)(Client &, const IRCMessage&)) {
     const size_t IRC_MAX = IRC_LINE_MAX;
 
     while (true) {
         size_t pos = recv_buffer_.find("\r\n");
         if (pos == std::string::npos) {
             if (recv_buffer_.size() > IRC_MAX) {
-                pushSendQueueAndNotify("ERROR :Line too long\r\n");
+                pushSendQueue("ERROR :Line too long\r\n");
                 recv_buffer_.clear();
                 disconnected_ = true;
-                if (disconnectNotify_) disconnectNotify_(socket_fd_);
             }
             break;
         }
 
         size_t lineLenWithCRLF = pos + 2;
         if (lineLenWithCRLF > IRC_MAX) {
-            pushSendQueueAndNotify("ERROR :Line too long\r\n");
+            pushSendQueue("ERROR :Line too long\r\n");
             recv_buffer_.erase(0, lineLenWithCRLF);
             continue;
         }
@@ -161,7 +155,7 @@ void Client::processBuffer(void (*onMessageParsed)(Client &, std::string command
             if (c < 32) { bad = true; break; }
         }
         if (bad) {
-            pushSendQueueAndNotify("ERROR :Invalid characters in message\r\n");
+            pushSendQueue("ERROR :Invalid characters in message\r\n");
             continue;
         }
         
@@ -170,7 +164,7 @@ void Client::processBuffer(void (*onMessageParsed)(Client &, std::string command
         //LO QUE LE PASE AL MENSAJE PARSEADO
         IRCMessage msg = parseMessage(line);
         if (onMessageParsed && !disconnected_) {
-            onMessageParsed(*this, msg.command,msg.params);
+            onMessageParsed(*this, msg);
         }
 
         updateLastActivity();
@@ -179,10 +173,8 @@ void Client::processBuffer(void (*onMessageParsed)(Client &, std::string command
 
 // =========================== Send queue =====================
 
-void Client::pushSendQueueAndNotify(const std::string& msg) {
+void Client::pushSendQueue(const std::string& msg) {
     send_queue_.push_back(msg);
-    // notificar a A que hay datos para escribira
-    if (writeNotify_) writeNotify_(socket_fd_);
 }
 
 bool Client::enqueueMessage(const std::string& raw) {
@@ -194,7 +186,7 @@ bool Client::enqueueMessage(const std::string& raw) {
         return false;
     }
 
-    pushSendQueueAndNotify(msg);
+    pushSendQueue(msg);
     return true;
 }
 
@@ -225,7 +217,6 @@ void Client::markSent(size_t n) {
             send_offset_ = 0;
         }
     }
-    if (!send_queue_.empty() && writeNotify_) writeNotify_(socket_fd_);
 }
 
 bool Client::hasPendingSend() const {
@@ -238,7 +229,7 @@ void Client::clearSendQueue() {
 }
 
 // =========================== Canales ===========================
-
+//MARK: joinChannel
 void Client::joinChannel(const std::string& name) { channels_.insert(name); }
 
 void Client::leaveChannel(const std::string& name) {
@@ -262,16 +253,12 @@ void Client::handleDisconnect() {
     clearSendQueue();
     recv_buffer_.clear();
     // notificar a A
-    if (disconnectNotify_) disconnectNotify_(socket_fd_);
     // cerrar descriptor localmente (A podría ya haberlo cerrado; esto es defensivo)
-    // if (socket_fd_ >= 0) {
-    //     close(socket_fd_);
-    //     socket_fd_ = -1;
-    // }
+    if (socket_fd_ >= 0) {
+        close(socket_fd_);
+        socket_fd_ = -1;
+    }
 }
 
-// =========================== Callbacks =======================
 
-void Client::setDisconnectNotify(NotifyFn f) { disconnectNotify_ = f; }
-void Client::setWriteNotify(NotifyFn f) { writeNotify_ = f; }
 

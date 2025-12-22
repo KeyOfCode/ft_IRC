@@ -49,8 +49,8 @@ void handleCommandFromServer(Client &c, const IRCMessage& msg)
 
         // Respuestas simuladas del servidor
         c.enqueueMessage(":" + c.prefix() + " JOIN " + channel);
-        c.enqueueMessage(":server 353 " + c.getNickname() + " = " + channel + " :@" + c.getNickname());
-        c.enqueueMessage(":server 366 " + channel + " :End of /NAMES list.");
+        c.enqueueMessage(":Server 353 " + c.getNickname() + " = " + channel + " :@" + c.getNickname());
+        c.enqueueMessage(":Server 366 " + channel + " :End of /NAMES list.");
         printClient(&c);
     }
     else if (msg.command == "PRIVMSG")
@@ -70,6 +70,14 @@ void handleCommandFromServer(Client &c, const IRCMessage& msg)
 
 
 
+void onMessageParsed(int fd, const IRCMessage& msg)
+{
+    std::cout << "[PARSED] FD=" << fd  
+              << " CMD=" << msg.command;
+    if (!msg.params.empty())
+        std::cout << " param0=" << msg.params[0];
+    std::cout << std::endl;
+}
 
 int main() {
     signal(SIGINT,handle_sig);

@@ -5,8 +5,8 @@ CPPFLAGS = -Wall -Wextra -Werror
 USER = paromero
 OBJ_DIR = objs
 OBJS = $(patsubst %.cpp, $(OBJ_DIR)/%.o, $(SRCS))
-SRCS = main.cpp src/server.cpp src/client.cpp
-HEADERS = include/server.hpp include/client.hpp include/command.hpp include/parser.hpp
+SRCS = main.cpp src/Server.cpp src/client.cpp src/Channel.cpp src/parser.cpp src/command.cpp
+HEADERS = include/Server.hpp include/client.hpp include/command.hpp include/parser.hpp
 
 NAME = test_client
 
@@ -28,6 +28,10 @@ $(OBJ_DIR)/%.o: %.cpp | $(OBJ_DIR)
 
 $(OBJ_DIR):
 	@mkdir -p $(OBJ_DIR)
+
+exe:
+	@make
+	./$(NAME) 1234 1234
 
 clean:
 	@echo "$(GREEN)Cleaning...$(RESET)"
