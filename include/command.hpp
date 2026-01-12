@@ -6,7 +6,7 @@
 /*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/19 15:58:30 by darismen          #+#    #+#             */
-/*   Updated: 2025/12/19 17:44:19 by darismen         ###   ########.fr       */
+/*   Updated: 2026/01/12 19:53:06 by darismen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,14 @@ class Pass : public Command
 	public:
 		Pass(Server *srv) : Command(srv) {}
 		~Pass() {}
+		void execute(Client* client, std::vector<std::string> args);
+};
+
+class Who : public Command
+{
+	public:
+		Who(Server *srv) : Command(srv) {}
+		~Who() {}
 		void execute(Client* client, std::vector<std::string> args);
 };
 

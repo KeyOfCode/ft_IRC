@@ -1,0 +1,6 @@
+12/01 darismen: !BUG: Trying to connect to the server a second time results in 
+	the user disconnecting and reconnecting. This results in the user being listed as already
+	in the channel, but being unable to join again.
+	
+	!BUG: For some reason, the channel is not being added as a param to the IRCMessage.
+		This causese several issues in the commands.

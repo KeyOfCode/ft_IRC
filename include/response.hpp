@@ -6,7 +6,7 @@
 /*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/08 18:39:34 by darismen          #+#    #+#             */
-/*   Updated: 2025/12/22 13:48:12 by darismen         ###   ########.fr       */
+/*   Updated: 2026/01/12 20:14:57 by darismen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,7 @@
 #define RPL_MODE(client, channel, modes, args)          ":" + CLIENT_PREFIX(client) + " MODE " + channel + " " + modes + " " + args
 #define RPL_PING(client, token)                         ":" + CLIENT_PREFIX(client) + " PONG :" + token
 #define RPL_NOTICE(client, target, message)             ":" + CLIENT_PREFIX(client) + " NOTICE " + target + " :" + message
+#define RPL_WHO(client, target)             			":" + CLIENT_PREFIX(client) + " WHO " + target + " :"
 /* Error Responses */
 
 #define ERR_NOTREGISTERED(source)                       "451 " + source + " :You have not registered"

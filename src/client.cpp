@@ -105,9 +105,11 @@ IRCMessage Client::parseMessage(const std::string& line) {
     size_t sp = line.find(' ', pos);
     if (sp == std::string::npos) {
         msg.command = line.substr(pos);
+        std::transform(msg.command.begin(), msg.command.end(), msg.command.begin(), ::toupper);
         return msg;
     }
     msg.command = line.substr(pos, sp - pos);
+    std::transform(msg.command.begin(), msg.command.end(), msg.command.begin(), ::toupper);
     pos = sp + 1;
 
     // Params y trailing
@@ -119,6 +121,7 @@ IRCMessage Client::parseMessage(const std::string& line) {
         size_t next = line.find(' ', pos);
         if (next == std::string::npos) {
             msg.params.push_back(line.substr(pos));
+            std::cout << "Param: " << line.substr(pos) << std::endl;
             break;
         } else {
             msg.params.push_back(line.substr(pos, next - pos));
@@ -171,9 +174,9 @@ void Client::processBuffer(Server *srv,Parser* parser,void (*onMessageParsed)(Se
         //LO QUE LE PASE AL MENSAJE PARSEADO
         /** ! Comments must be in english */
         IRCMessage msg = parseMessage(line);
-        if (onMessageParsed && !disconnected_) {
-            onMessageParsed(srv,parser,this, msg.command,msg.params);
-        }
+        std::cout << "msg log: prefix: " << msg.prefix << " command: " << msg.command << " trailing: " << msg.trailing << std::endl;
+        if (onMessageParsed && !disconnected_)
+            onMessageParsed(srv, parser, this, msg.command, msg.params);
 
         updateLastActivity();
     }

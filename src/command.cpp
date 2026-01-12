@@ -6,7 +6,7 @@
 /*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/08 18:32:33 by darismen          #+#    #+#             */
-/*   Updated: 2026/01/12 17:30:18 by darismen         ###   ########.fr       */
+/*   Updated: 2026/01/12 20:20:50 by darismen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,17 @@ void Pass::execute(Client* client, std::vector<std::string> args)
 		return;
 	// Set client password or validate
 	// For now, just accept it
+}
+//MARK: Who
+void Who::execute(Client* client, std::vector<std::string> args)
+{
+	std::string tgt_channel = args[0];
+	
+	Channel *channel = _srv->getChannel(tgt_channel);
+	std::vector<std::string> members = channel->getNicknames();
+	channel->broadcast(RPL_WHO(client, tgt_channel));
+	for (size_t i = 0; i < members.size(); i++)
+		channel->broadcast(members[i]);
 }
 
 //MARK: Kick
@@ -117,7 +128,7 @@ void	Invite::execute(Client* client, std::vector<std::string> args)
 	dest->joinChannel(tgt_channel);
 }
 // MARK: Topic
-// syntax: NOTICE <msgtarget> <message>
+// syntax: Topic <msgtarget> <message>
 void	Topic::execute(Client* client, std::vector<std::string> args)
 {
 	if (args.size() < 2 || args[0].empty() || args[1].empty())
@@ -239,8 +250,8 @@ void    User::execute(Client* client, std::vector<std::string> args)
 // syntax: PRIVMSG <msgtarget> :<message>
 void	PrivMsg::execute(Client* client, std::vector<std::string> args)
 {
-	if (args.size() < 2 || args[0].empty() || args[1].empty())
-		return void(_srv->sendResponse(ERR_NEEDMOREPARAMS(client->getNickname(), "PrivMsg"), client->getSocketFd()));
+	// if (args.size() < 2 || args[0].empty() || args[1].empty())
+	// 	return void(_srv->sendResponse(ERR_NEEDMOREPARAMS(client->getNickname(), "PrivMsg"), client->getSocketFd()));
 	
 	std::string target = args[0];
 	std::string message = "";

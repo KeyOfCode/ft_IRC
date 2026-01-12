@@ -6,7 +6,7 @@
 /*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/19 16:52:12 by darismen          #+#    #+#             */
-/*   Updated: 2025/12/19 18:02:49 by darismen         ###   ########.fr       */
+/*   Updated: 2026/01/12 20:26:12 by darismen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@ Parser::Parser(Server* srv) : _srv(srv)
 	_commands["INVITE"] = new Invite(_srv);
 	_commands["TOPIC"] = new Topic(_srv);
 	// _commands["MODE"] = new Mode(_srv);
+	_commands["WHO"] = new Who(_srv);
 	
 	_commands["CAP"] = new Cap(_srv);
 	_commands["PASS"] = new Pass(_srv);
@@ -27,7 +28,7 @@ Parser::Parser(Server* srv) : _srv(srv)
 	_commands["NICK"] = new Nick(_srv);
 	_commands["USER"] = new User(_srv);
 	_commands["PRIVMSG"] = new PrivMsg(_srv);
-	_commands["NOTICE"] = new PrivMsg(_srv);
+	_commands["NOTICE"] = new Notice(_srv);
 
 	_commands["PING"] = new Ping(_srv);
 	_commands["PONG"] = new Pong(_srv);
