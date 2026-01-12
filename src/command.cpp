@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   command.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pjimenez <pjimenez@student.42malaga.com    +#+  +:+       +#+        */
+/*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/08 18:32:33 by darismen          #+#    #+#             */
-/*   Updated: 2025/12/12 18:51:25 by pjimenez         ###   ########.fr       */
+/*   Updated: 2026/01/12 17:30:18 by darismen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -204,6 +204,7 @@ void	Part::execute(Client* client, std::vector<std::string> args)
 	Channel *channel = _srv->getChannel(tgt_channel);
 	channel->remove_client(client);
 	client->leaveChannel(tgt_channel);
+	_srv->sendResponse(RPL_PART(client, tgt_channel), client->getSocketFd());
 }
 
 //MARK: NICK

@@ -6,7 +6,7 @@
 /*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/10 10:39:51 by paromero          #+#    #+#             */
-/*   Updated: 2025/12/19 18:49:03 by darismen         ###   ########.fr       */
+/*   Updated: 2026/01/12 17:50:14 by darismen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,16 +107,19 @@ void	Server::sendResponse(const std::string& response, int fd)
 		std::cout << "Sent " << sent << " bytes to fd " << fd << ": " << msg;
 	}
 }
+//MARK: getpassword
 std::string	Server::getpassword() {
 	return this->pswd_;
 }
 
+//MARK: handle_signal
 void	Server::handle_signal(int sig) {
 	(void)sig;
 	std::cout << std::endl << "Signal detected, exiting..." << std::endl;
 	Server::signal_ = true;
 }
 
+//MARK: find_poll_index
 int	Server::find_poll_index(int fd) {
 	for (size_t i = 0; i < pollfds_.size(); ++i) {
 		if (pollfds_[i].fd == fd)
@@ -125,6 +128,7 @@ int	Server::find_poll_index(int fd) {
 	return -1;
 }
 
+//MARK: getclient
 Client*	Server::getclient(int fd) {
 	std::map<int, Client *>::iterator it = clients_.find(fd);
 	if (it != clients_.end())
@@ -132,6 +136,7 @@ Client*	Server::getclient(int fd) {
 	return NULL;
 }
 
+//MARK: getclient
 Client*	Server::getclient(std::string name) {
 	std::map<int, Client *>::const_iterator it = clients_.begin();
 	for (; it != clients_.end(); it++)
@@ -140,8 +145,10 @@ Client*	Server::getclient(std::string name) {
 	return NULL;
 }
 
+//MARK: get_all_Channels
 std::set<Channel *>	Server::get_all_Channels() {return this->channels_;}
 
+//MARK: getChannel
 Channel*		Server::getChannel(std::string name)
 {
 	std::set<Channel *>::const_iterator it = this->channels_.begin();
@@ -152,6 +159,7 @@ Channel*		Server::getChannel(std::string name)
 	return NULL;
 }
 
+//MARK: add_Channel
 void		Server::add_Channel(Channel * new_channel)
 {
 	if (this->getChannel(new_channel->getName()) == NULL)
@@ -251,7 +259,7 @@ void	Server::accept_new_clients() {
 	return msg;	
 } */
 
-//MARK: parseMEssage
+//MARK: parseMessage
 // IRCMessage parseMessage(std::string line)
 // {
 // 	IRCMessage msg;
@@ -351,7 +359,7 @@ void	Server::handle_read(int fd) {
 			size_t finalpos = line.find('\r', firstpos);
 			
 			if (finalpos == std::string::npos)
-			return;
+				return;
 			finalpos = finalpos - firstpos;
 			std::string password = line.substr(firstpos, finalpos);
 			if (password != this->pswd_) {

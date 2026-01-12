@@ -6,7 +6,7 @@
 /*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/09 14:05:47 by darismen          #+#    #+#             */
-/*   Updated: 2025/12/19 18:36:30 by darismen         ###   ########.fr       */
+/*   Updated: 2026/01/12 17:34:44 by darismen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,10 +95,6 @@ void	Channel::remove_client(Client* client)
 {
 	// isClientMember should be handled in the command, not here.
 	_clients.erase(std::remove(_clients.begin(), _clients.end(), client), _clients.end());
-	// client_it it = this->_clients.begin();
-	// for (; it != this->_clients.end(); it++)
-	// 	if ((*it) == client)
-	// 		it = this->_clients.erase(it);
 }
 
 bool	Channel::isClientMember(Client* client)
@@ -137,7 +133,7 @@ bool	Channel::isClientAdmin(Client* client)
 
 void	Channel::kick(Client* client, Client* target, const std::string& reason)
 {
-	this->broadcast(RPL_KICK(client->getNickname(), this->_name, target->getNickname(), reason));
+	this->broadcast(RPL_KICK(client, this->_name, target->getNickname(), reason));
 	this->remove_client(client);
 	
 	log(client->getNickname() + " kicked " + target->getNickname() + " from channel " + _name);

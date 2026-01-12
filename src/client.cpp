@@ -35,7 +35,7 @@ Client::~Client()
         socket_fd_ = -1;
     }
 }
-
+// MARK: Getters / Setters
 // =========================== Getters / Setters ================================
 
 int Client::getSocketFd() const { return socket_fd_; }
@@ -60,7 +60,7 @@ bool Client::isFullyRegistered() const { return pass_ok_ && nick_ok_ && user_ok_
 
 // =========================== Recv buffer handling ============================
 
-
+// MARK: appendToRecvBuffer
 void Client::appendToRecvBuffer(const std::string& data)
 {
     if (recv_buffer_.size() + data.size() > RECV_BUFFER_LIMIT) {
@@ -71,8 +71,10 @@ void Client::appendToRecvBuffer(const std::string& data)
     recv_buffer_ += data;
 }
 
+// MARK: recvBufferSize
 size_t Client::recvBufferSize() const { return recv_buffer_.size(); }
 
+// MARK: popRecv
 void Client::popRecv(size_t len)
 {
     if (len >= recv_buffer_.size()) recv_buffer_.clear();
@@ -81,6 +83,7 @@ void Client::popRecv(size_t len)
 
 // =========================== Parsing / processBuffer ========================
 
+// MARK: parseMessage
 IRCMessage Client::parseMessage(const std::string& line) {
     IRCMessage msg;
     size_t pos = 0;
@@ -125,6 +128,7 @@ IRCMessage Client::parseMessage(const std::string& line) {
     return msg;
 }
 
+// MARK: processBuffer
 void Client::processBuffer(Server *srv,Parser* parser,void (*onMessageParsed)(Server *srv, Parser* parser,Client *, std::string command, std::vector<std::string> params)) {
     const size_t IRC_MAX = IRC_LINE_MAX;
 
@@ -165,6 +169,7 @@ void Client::processBuffer(Server *srv,Parser* parser,void (*onMessageParsed)(Se
         //aqui seguramente habra que hacer cambios
         // Parse y callback
         //LO QUE LE PASE AL MENSAJE PARSEADO
+        /** ! Comments must be in english */
         IRCMessage msg = parseMessage(line);
         if (onMessageParsed && !disconnected_) {
             onMessageParsed(srv,parser,this, msg.command,msg.params);
@@ -173,12 +178,15 @@ void Client::processBuffer(Server *srv,Parser* parser,void (*onMessageParsed)(Se
         updateLastActivity();
     }
 }
+
 // =========================== Send queue =====================
 
+// MARK: pushSendQueue
 void Client::pushSendQueue(const std::string& msg) {
     send_queue_.push_back(msg);
 }
 
+// MARK: enqueueMessage
 bool Client::enqueueMessage(const std::string& raw) {
     std::string msg = raw;
     if (msg.size() < 2 || msg.substr(msg.size() - 2) != "\r\n")
@@ -193,6 +201,7 @@ bool Client::enqueueMessage(const std::string& raw) {
 }
 
 
+// MARK: peekSend
 std::string Client::peekSend(size_t maxlen) const {
     if (send_queue_.empty()) return std::string();
 
@@ -204,6 +213,7 @@ std::string Client::peekSend(size_t maxlen) const {
     return front.substr(send_offset_, take);
 }
 
+// MARK: markSent
 void Client::markSent(size_t n) {
     if (send_queue_.empty()) return;
     size_t remaining = n;
@@ -221,25 +231,31 @@ void Client::markSent(size_t n) {
     }
 }
 
+// MARK: hasPendingSend
 bool Client::hasPendingSend() const {
     return !send_queue_.empty();
 }
 
+// MARK: clearSendQueue
 void Client::clearSendQueue() {
     send_queue_.clear();
     send_offset_ = 0;
 }
 
 // =========================== Canales ===========================
-//MARK: joinChannel
+
+// MARK: joinChannel
 void Client::joinChannel(const std::string& name) { channels_.insert(name); }
 
+// MARK: leaveChannel
 void Client::leaveChannel(const std::string& name) {
     std::set<std::string>::iterator it = channels_.find(name);
     if (it != channels_.end()) channels_.erase(it);
 }
+// MARK: updateLastActivity
 void Client::updateLastActivity() { last_activity_ = std::time(0); }
 
+// MARK: prefix
 std::string Client::prefix() const {
     std::string nick = nickname_.empty() ? "*" : nickname_;
     std::string user = username_.empty() ? "unknown" : username_;
@@ -249,6 +265,7 @@ std::string Client::prefix() const {
 
 // =========================== Disconnect =======================
 
+// MARK: handleDisconnect
 void Client::handleDisconnect() {
     if (disconnected_) return;
     disconnected_ = true;
