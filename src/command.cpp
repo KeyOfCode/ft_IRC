@@ -6,7 +6,7 @@
 /*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/08 18:32:33 by darismen          #+#    #+#             */
-/*   Updated: 2026/01/13 12:13:06 by darismen         ###   ########.fr       */
+/*   Updated: 2026/01/13 14:03:40 by darismen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,9 +53,14 @@ void Pass::execute(Client* client, std::vector<std::string> args)
 //MARK: Who
 void Who::execute(Client* client, std::vector<std::string> args)
 {
+	if (args.size() == 0)
+		return void(_srv->sendResponse(ERR_NEEDMOREPARAMS(client->getNickname(), "WHO"), client->getSocketFd()));
+	
 	std::string tgt_channel = args[0];
 	
 	Channel *channel = _srv->getChannel(tgt_channel);
+	if (!channel)
+		return void(_srv->sendResponse(ERR_NOSUCHNICK(client->getNickname(), tgt_channel), client->getSocketFd()));
 	std::vector<std::string> members = channel->getNicknames();
 	channel->broadcast(RPL_WHO(client, tgt_channel));
 	for (size_t i = 0; i < members.size(); i++)
@@ -71,18 +76,18 @@ void Kick::execute(Client* client, std::vector<std::string> args)
 
 	std::string tgt_channel = args[0];
 	std::string target_user = args[1];
-	std::string reason = "No reason specified!";
+	std::string reason = (args.size() > 3) ? args[2] : "No reason specified!";
 	
 	
-	if (args.size() >= 3 && (args[2][0] != ':' || args[2].size() > 1))
-	{
-		reason = "";
-		for (size_t i = 2; i < args.size(); i++)
-		{
-			if (i > 2) reason += " ";
-			reason += args[i];
-		}
-	}
+	// if (args.size() >= 3 && (args[2][0] != ':' || args[2].size() > 1))
+	// {
+	// 	reason = "";
+	// 	for (size_t i = 2; i < args.size(); i++)
+	// 	{
+	// 		if (i > 2) reason += " ";
+	// 		reason += args[i];
+	// 	}
+	// }
 	std::set<std::string> channels = client->getChannels();
 	
 	if (std::find(channels.begin(), channels.end(), tgt_channel) == channels.end())
@@ -99,7 +104,6 @@ void Kick::execute(Client* client, std::vector<std::string> args)
 	Channel *channel = _srv->getChannel(tgt_channel);
 	channel->kick(client, dest, reason);
 	dest->leaveChannel(tgt_channel);
-
 }
 // MARK: Invite
 // INVITE args: *client, <channel> <target> 
@@ -135,16 +139,16 @@ void	Topic::execute(Client* client, std::vector<std::string> args)
 		return void(_srv->sendResponse(ERR_NEEDMOREPARAMS(client->getNickname(), "Topic"), client->getSocketFd()));
 	
 	std::string tgt_channel = args[0];
-	std::string message = "";
-	std::vector<std::string>::iterator it = args.begin() + 1;
+	std::string message = (args.size() > 1) ? args[1] : "";
+	// std::vector<std::string>::iterator it = args.begin() + 1;
 
-	while (it != args.end())
-	{
-		message.append(*it);
-		it++;
-		if (it != args.end())
-			message.append(" ");
-	}
+	// while (it != args.end())
+	// {
+	// 	message.append(*it);
+	// 	it++;
+	// 	if (it != args.end())
+	// 		message.append(" ");
+	// }
 
 	Channel *channel = _srv->getChannel(tgt_channel);
 	if (!channel)
@@ -155,7 +159,6 @@ void	Topic::execute(Client* client, std::vector<std::string> args)
 }
 
 // MARK: Mode
-// syntax:  MODE <nickname> <flags> (user)
 //          MODE <channel> <flags> [<args>]
 void	Mode::execute(Client* client, std::vector<std::string> args)
 {
@@ -168,7 +171,18 @@ void	Mode::execute(Client* client, std::vector<std::string> args)
 		return void(_srv->sendResponse(ERR_NOSUCHCHANNEL(client->getNickname(), target), client->getSocketFd()));
 	if (!channel->isClientAdmin(client))
 		return void(_srv->sendResponse(ERR_CHANOPRIVSNEEDED(client->getNickname(), target), client->getSocketFd()));
-		
+	
+	for (size_t i = 1; i < args.size(); i++)
+	{
+		if (channel->hasMode(args[i][1]))
+		{
+			if (args[i][0] == '+')
+				channel->setMode(args[i][i], true);
+			else
+				channel->setMode(args[i][i], false);
+		}
+		//TODO DEFINE BEHAVIOUR FOR OPTIONAL PARAMS LIKE +l 10
+	}
 }
 
 /**
@@ -250,23 +264,23 @@ void    User::execute(Client* client, std::vector<std::string> args)
 // syntax: PRIVMSG <msgtarget> :<message>
 void	PrivMsg::execute(Client* client, std::vector<std::string> args)
 {
-	// if (args.size() < 2 || args[0].empty() || args[1].empty())
-	// 	return void(_srv->sendResponse(ERR_NEEDMOREPARAMS(client->getNickname(), "PrivMsg"), client->getSocketFd()));
+	if (args.size() < 2 || args[0].empty() || args[1].empty())
+		return void(_srv->sendResponse(ERR_NEEDMOREPARAMS(client->getNickname(), "PrivMsg"), client->getSocketFd()));
 	
 	std::string target = args[0];
-	std::string message = "";
-	std::vector<std::string>::iterator it = args.begin() + 1;
+	std::string message = (args.size() > 1) ? args[1] : "";
+	// std::vector<std::string>::iterator it = args.begin() + 1;
 
-	while (it != args.end())
-	{
-		message.append(*it);
-		it++;
-		if (it != args.end())
-			message.append(" ");
-	}
+	// while (it != args.end())
+	// {
+	// 	message.append(*it);
+	// 	it++;
+	// 	if (it != args.end())
+	// 		message.append(" ");
+	// }
 
-	if (!message.empty() && message[0] == ':')
-		message = message.substr(1);
+	// if (!message.empty() && message[0] == ':')
+	// 	message = message.substr(1);
 
 	Client *dest = _srv->getclient(target);
 	if (!dest)
@@ -283,29 +297,33 @@ void	Notice::execute(Client* client, std::vector<std::string> args)
 		return void(_srv->sendResponse(ERR_NEEDMOREPARAMS(client->getNickname(), "Notice"), client->getSocketFd()));
 	
 	std::string tgt_channel;
-	std::string message = "";
-	std::vector<std::string>::iterator it = args.begin();
+	std::string message;
+	// std::vector<std::string>::iterator it = args.begin();
 	if (args[0][0] == '#')
-		{tgt_channel = args[0]; it++;}
+	{
+		tgt_channel = args[0];
+		message = (args.size() > 1) ? args[1] : "";
+	}
 	else
 	{
 		std::set<std::string> channels = client->getChannels();
 		if (channels.empty())
 			return void(_srv->sendResponse(ERR_NOTONCHANNEL(client->getNickname(), ""), client->getSocketFd()));
 		tgt_channel =  *channels.rbegin();
+		message = args[0];
 	}
 	
-	while (it != args.end())
-	{
-		message.append(*it);
-		it++;
-		if (it != args.end())
-			message.append(" ");
-	}
+	// while (it != args.end())
+	// {
+	// 	message.append(*it);
+	// 	it++;
+	// 	if (it != args.end())
+	// 		message.append(" ");
+	// }
 	
 	Channel *channel = _srv->getChannel(tgt_channel);
 	if (!channel)
-	return void(_srv->sendResponse(ERR_NOSUCHCHANNEL(client->getNickname(), tgt_channel), client->getSocketFd()));
+		return void(_srv->sendResponse(ERR_NOSUCHCHANNEL(client->getNickname(), tgt_channel), client->getSocketFd()));
 
 	channel->broadcast(RPL_NOTICE(client, tgt_channel, message));
 }

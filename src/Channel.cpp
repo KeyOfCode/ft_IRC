@@ -6,7 +6,7 @@
 /*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/09 14:05:47 by darismen          #+#    #+#             */
-/*   Updated: 2026/01/12 17:34:44 by darismen         ###   ########.fr       */
+/*   Updated: 2026/01/13 14:02:15 by darismen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,8 @@ std::vector<std::string>    Channel::getNicknames()
 void	Channel::setKey(std::string key) {this->_key = key;}
 void	Channel::setLimit(size_t limit) {this->_limit = limit;}
 void	Channel::setTopic(std::string topic) {this->_topic = topic;}
+
+void	Channel::setMode(char mode, bool val) {this->_modes[mode] = val;}
 
 /* Channel Actions */
 //MARK: broacast

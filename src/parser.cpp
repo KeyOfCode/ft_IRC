@@ -6,7 +6,7 @@
 /*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/19 16:52:12 by darismen          #+#    #+#             */
-/*   Updated: 2026/01/12 20:26:12 by darismen         ###   ########.fr       */
+/*   Updated: 2026/01/13 13:37:18 by darismen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ Parser::Parser(Server* srv) : _srv(srv)
 	_commands["KICK"] = new Kick(_srv);
 	_commands["INVITE"] = new Invite(_srv);
 	_commands["TOPIC"] = new Topic(_srv);
-	// _commands["MODE"] = new Mode(_srv);
+	_commands["MODE"] = new Mode(_srv);
 	_commands["WHO"] = new Who(_srv);
 	
 	_commands["CAP"] = new Cap(_srv);
@@ -51,7 +51,8 @@ const std::map<std::string, Command *>& Parser::getCommands() const { return _co
 //:Nickname!Username@Servername Cualquier cosa
 //:Nickname!Username@Servername CMD <params>
 
-void	invoke(Server *srv, Parser *prs, Client* client, std::string command, std::vector<std::string> params)
+void	invoke(Server *srv, Parser *prs, Client* client, std::string command,
+		std::vector<std::string> params)
 {
 		const std::map<std::string, Command*>& commands = prs->getCommands();
 		std::map<std::string, Command*>::const_iterator it = commands.find(command);

@@ -6,7 +6,7 @@
 /*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/09 13:30:09 by darismen          #+#    #+#             */
-/*   Updated: 2025/12/17 19:35:47 by darismen         ###   ########.fr       */
+/*   Updated: 2026/01/13 14:01:53 by darismen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,7 @@ class Channel
 		void	setKey(std::string key);
 		void	setLimit(size_t limit);
 		void	setTopic(std::string topic);
+		void	setMode(char mode, bool val);
 		// void                        set_ext_msg(bool flag);
 
 		/* Channel Actions */

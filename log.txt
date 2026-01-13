@@ -4,3 +4,10 @@
 	
 	!BUG: For some reason, the channel is not being added as a param to the IRCMessage.
 		This causese several issues in the commands.
+
+13/01 darismen: La razon por la cual PRIVMSG devuelve un error es porque el commando usa el
+		el trailing como el mensaje, y el canal como parametro. Hay que introducir el trailing
+		en la ejecución del commando PRIVMSG.
+		
+		En general, parece que los comandos aceptan solo un parametro, y todo lo demas es tratado
+		como trailing. Por tanto hay que re-estructurar como manejamos los IRCMessage.

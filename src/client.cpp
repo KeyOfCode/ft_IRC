@@ -124,6 +124,7 @@ IRCMessage Client::parseMessage(const std::string& line) {
             std::cout << "Param: " << line.substr(pos) << std::endl;
             break;
         } else {
+            std::cout << "Param: " << line.substr(pos, next - pos) << std::endl;
             msg.params.push_back(line.substr(pos, next - pos));
             pos = next + 1;
         }
@@ -174,6 +175,8 @@ void Client::processBuffer(Server *srv,Parser* parser,void (*onMessageParsed)(Se
         //LO QUE LE PASE AL MENSAJE PARSEADO
         /** ! Comments must be in english */
         IRCMessage msg = parseMessage(line);
+        if (!msg.trailing.empty())
+            msg.params.push_back(msg.trailing);
         std::cout << "msg log: prefix: " << msg.prefix << " command: " << msg.command << " trailing: " << msg.trailing << std::endl;
         if (onMessageParsed && !disconnected_)
             onMessageParsed(srv, parser, this, msg.command, msg.params);

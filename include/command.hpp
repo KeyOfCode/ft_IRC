@@ -6,7 +6,7 @@
 /*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/19 15:58:30 by darismen          #+#    #+#             */
-/*   Updated: 2026/01/12 19:53:06 by darismen         ###   ########.fr       */
+/*   Updated: 2026/01/13 13:21:17 by darismen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -153,6 +153,7 @@ class PrivMsg : public Command
 		~PrivMsg() {}
 
 		void execute(Client* client, std::vector<std::string> args);
+		void execute(Client* client, std::vector<std::string> args, std::vector<std::string> trailing);
 };
 
 class Notice : public Command
