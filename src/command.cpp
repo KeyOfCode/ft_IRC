@@ -6,7 +6,7 @@
 /*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/08 18:32:33 by darismen          #+#    #+#             */
-/*   Updated: 2026/01/12 20:20:50 by darismen         ###   ########.fr       */
+/*   Updated: 2026/01/13 12:13:06 by darismen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -276,6 +276,7 @@ void	PrivMsg::execute(Client* client, std::vector<std::string> args)
 }
 
 //MARK: Notice
+// args: <param> <:trailing>
 void	Notice::execute(Client* client, std::vector<std::string> args)
 {
 	if (args.size() < 2 || args[0].empty() || args[1].empty())
