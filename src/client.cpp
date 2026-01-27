@@ -178,6 +178,7 @@ void Client::processBuffer(Server *srv,Parser* parser,void (*onMessageParsed)(Se
         if (!msg.trailing.empty())
             msg.params.push_back(msg.trailing);
         std::cout << "msg log: prefix: " << msg.prefix << " command: " << msg.command << " trailing: " << msg.trailing << std::endl;
+
         if (onMessageParsed && !disconnected_)
             onMessageParsed(srv, parser, this, msg.command, msg.params);
 

@@ -6,7 +6,7 @@
 /*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/09 14:05:47 by darismen          #+#    #+#             */
-/*   Updated: 2026/01/13 14:02:15 by darismen         ###   ########.fr       */
+/*   Updated: 2026/01/27 13:01:49 by darismen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,11 +23,11 @@ Channel::Channel(const std::string &name, const std::string &key, Client* admin,
 	_clients.push_back(admin);
 	_admins.push_back(admin);
 	_modes = {
-		{'i', false},
-		{'t', false},
-		{'k', false},
-		{'o', false},
-		{'l', false},
+		{'i', false}, //Invite-only
+		{'t', false}, //Topic restricted (only ops can change)
+		{'k', false}, //Keyword/key required to join
+		{'o', false}, //Operator
+		{'l', false}, //Limit (max users)
 	};
 	_limit = 10;
 }
@@ -43,6 +43,7 @@ std::vector<Client *>		Channel::getAdminList() const { return this->_admins;}
 std::string		Channel::getKey() const { return this->_key;}
 size_t			Channel::getSize() const { return this->_clients.size();}
 size_t			Channel::getLimit() const { return this->_limit;}
+std::string		Channel::getTopic() const { return this->_topic;}
 
 std::vector<std::string>    Channel::getNicknames()
 {
@@ -86,7 +87,7 @@ void	Channel::broadcast(const std::string& message, Client* exclude)
 //MARK: add_client
 void	Channel::add_client(Client* client)
 {	
-	if (!this->isClientMember(client))
+	if (this->isClientMember(client))
 		return void(_srv->sendResponse(ERR_ALREADYINCHANNEL(client->getNickname(), this->getName()), client->getSocketFd()));
 	if (this->getSize() >= this->getLimit())
 		return void(_srv->sendResponse(ERR_CHANNELISFULL(client->getNickname(), this->getName()), client->getSocketFd()));
@@ -108,7 +109,7 @@ bool	Channel::isClientMember(Client* client)
 
 void	Channel::add_admin(Client* client)
 {	
-	if (!this->isClientAdmin(client))
+	if (this->isClientAdmin(client))
 		return void(_srv->sendResponse("Already Admin", client->getSocketFd()));
 
 	_admins.push_back(client);
@@ -136,7 +137,7 @@ bool	Channel::isClientAdmin(Client* client)
 void	Channel::kick(Client* client, Client* target, const std::string& reason)
 {
 	this->broadcast(RPL_KICK(client, this->_name, target->getNickname(), reason));
-	this->remove_client(client);
+	this->remove_client(target);
 	
 	log(client->getNickname() + " kicked " + target->getNickname() + " from channel " + _name);
 }

@@ -11,3 +11,16 @@
 		
 		En general, parece que los comandos aceptan solo un parametro, y todo lo demas es tratado
 		como trailing. Por tanto hay que re-estructurar como manejamos los IRCMessage.
+
+
+		FIX: Agregue el trailing a los params usando un pushback en client.cpp
+
+27/01 darismen:
+		PRIVMSG ahora correctamente hace el broadcast, pero solo lo recibe el creador del canal.
+		los otros clientes pueden enviar mensajes al canal, pero no pueden verlos, solo el 
+		creador.
+
+		Muchos comportamientos han sido corregidos. Creada branch WorkingCommands
+
+		TODO: Crear el PASS command, hacer que funcione con netcat y irssi, 
+		connectar distintos ordenadores.

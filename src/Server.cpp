@@ -6,7 +6,7 @@
 /*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/10 10:39:51 by paromero          #+#    #+#             */
-/*   Updated: 2026/01/12 17:50:14 by darismen         ###   ########.fr       */
+/*   Updated: 2026/01/27 12:54:41 by darismen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,12 +100,17 @@ void	Server::sendResponse(const std::string& response, int fd)
 	if (msg.size() < 2 || msg.substr(msg.size() - 2) != "\r\n")
 		msg += "\r\n";
 	
-	ssize_t sent = send(fd, msg.c_str(), msg.length(), 0);
-	if (sent == -1) {
-		std::cerr << "Send error for fd " << fd << ": " << strerror(errno) << std::endl;
-	} else {
-		std::cout << "Sent " << sent << " bytes to fd " << fd << ": " << msg;
-	}
+	client->enqueueMessage(msg);
+	// Activate POLLOUT for this fd
+	int idx = find_poll_index(fd);
+	if (idx != -1)
+		pollfds_[idx].events |= POLLOUT;
+	// ssize_t sent = send(fd, msg.c_str(), msg.length(), 0);
+	// if (sent == -1) {
+	// 	std::cerr << "Send error for fd " << fd << ": " << strerror(errno) << std::endl;
+	// } else {
+	// 	std::cout << "Sent " << sent << " bytes to fd " << fd << ": " << msg;
+	// }
 }
 //MARK: getpassword
 std::string	Server::getpassword() {
@@ -230,100 +235,6 @@ void	Server::accept_new_clients() {
 	pollfds_.push_back(newFD);
 	//DEBUG std::cout << "Client connected: FD=" << clientsocket_ << " Host=" << newclient->getHostname() << std::endl;
 }
-
-// /command params = CMD <params>
-// normal message == /privmsg <message>
-
-/* IRCMessage parseMessage(std::string line)
-{
-	IRCMessage msg;
-	size_t start = 0;
-
-	line = line.substr(start, line.size() - 2); //delete \r\n
-	
-	if (line[start] == ':')
-	{
-		msg.prefix = line.substr(start, line.find(' '));
-		start = line.find(' ', start);
-	}
-	
-	msg.command = line.substr(start, line.find(' ', start));
-	start = line.find(' ', start);
-
-	while(start != std::string::npos)
-	{
-		std::string param = line.substr(start, line.find(' ', start));
-		msg.params.push_back(param);
-		start = line.find(' ', start);
-	}
-	return msg;	
-} */
-
-//MARK: parseMessage
-// IRCMessage parseMessage(std::string line)
-// {
-// 	IRCMessage msg;
-// 	size_t start = 0;
-
-// 	// Remove \r\n
-// 	if (line.size() >= 2 && line[line.size() - 2] == '\r')
-// 		line = line.substr(0, line.size() - 2);
-	
-// 	// Parse prefix (if starts with :)
-// 	if (!line.empty() && line[0] == ':')
-// 	{
-// 		size_t space = line.find(' ');
-// 		if (space != std::string::npos)
-// 		{
-// 			msg.prefix = line.substr(1, space - 1);
-// 			start = space + 1;
-// 		}
-// 	}
-	
-// 	// Handle / prefix for commands
-// 	if (start < line.size() && line[start] == '/')
-// 		start++;  // Skip the /
-		
-// 	// Parse command
-// 	size_t space = line.find(' ', start);
-// 	// line = line.substr(start+1);
-// 	if (space != std::string::npos)
-// 	{
-// 		msg.command = line.substr(start, space - start);
-// 		std::transform(msg.command.begin(), msg.command.end(), msg.command.begin(), ::toupper);
-// 		start = space + 1;
-// 	}
-// 	else
-// 	{
-// 		msg.command = line.substr(start);
-// 		std::transform(msg.command.begin(), msg.command.end(), msg.command.begin(), ::toupper);
-// 		return msg;  // No params
-// 	}
-	
-// 	// Parse params and trailing
-// 	while (start < line.size())
-// 	{
-// 		if (line[start] == ':')
-// 		{
-// 			msg.trailing = line.substr(start + 1);
-// 			break;
-// 		}
-		
-// 		space = line.find(' ', start);
-// 		if (space != std::string::npos)
-// 		{
-// 			msg.params.push_back(line.substr(start, space - start));
-// 			start = space + 1;
-// 		}
-// 		else
-// 		{
-// 			msg.params.push_back(line.substr(start));
-// 			break;
-// 		}
-// 	}
-	
-// 	return msg;	
-// }
 
 //MARK: handle_read
 void	Server::handle_read(int fd) {
