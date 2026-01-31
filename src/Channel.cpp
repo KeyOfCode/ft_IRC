@@ -6,7 +6,7 @@
 /*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/09 14:05:47 by darismen          #+#    #+#             */
-/*   Updated: 2026/01/27 13:01:49 by darismen         ###   ########.fr       */
+/*   Updated: 2026/01/31 14:11:12 by darismen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ Channel::Channel(const std::string &name, const std::string &key, Client* admin,
 		{'i', false}, //Invite-only
 		{'t', false}, //Topic restricted (only ops can change)
 		{'k', false}, //Keyword/key required to join
-		{'o', false}, //Operator
+		//{'o', false}, //Operator
 		{'l', false}, //Limit (max users)
 	};
 	_limit = 10;
@@ -39,11 +39,13 @@ Channel::~Channel() {}
 std::string		Channel::getName() const { return this->_name;}
 
 std::vector<Client *>		Channel::getAdminList() const { return this->_admins;}
+std::vector<Client *>		Channel::getClientList() const { return this->_clients;}
 
 std::string		Channel::getKey() const { return this->_key;}
 size_t			Channel::getSize() const { return this->_clients.size();}
 size_t			Channel::getLimit() const { return this->_limit;}
 std::string		Channel::getTopic() const { return this->_topic;}
+bool			Channel::getModeValue(char c) const { return this->_modes.at(c);}
 
 std::vector<std::string>    Channel::getNicknames()
 {
@@ -104,14 +106,26 @@ bool	Channel::isClientMember(Client* client)
 {
 	if (std::find(this->_clients.begin(), this->_clients.end(), client) != this->_clients.end()) 
 		return true;
+	
 	return false;
+}
+
+Client*	Channel::getClient(std::string client)
+{
+	client_it it = this->_clients.begin();
+	for (; it != this->_clients.end(); it++)
+		if ((*it)->getNickname() == client)
+			return *it;
+
+	std::cout << "Client is not member" << std::endl;
+	return NULL;
 }
 
 void	Channel::add_admin(Client* client)
 {	
 	if (this->isClientAdmin(client))
 		return void(_srv->sendResponse("Already Admin", client->getSocketFd()));
-
+	_srv->sendResponse("Admin granted", client->getSocketFd());
 	_admins.push_back(client);
 }
 
@@ -145,5 +159,5 @@ void	Channel::kick(Client* client, Client* target, const std::string& reason)
 
 bool	Channel::hasMode(char c)
 {
-	return (_modes[c]);
+	return (_modes.find(c) != _modes.end());
 }

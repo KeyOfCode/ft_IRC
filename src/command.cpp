@@ -6,7 +6,7 @@
 /*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/08 18:32:33 by darismen          #+#    #+#             */
-/*   Updated: 2026/01/27 13:22:20 by darismen         ###   ########.fr       */
+/*   Updated: 2026/01/31 15:19:42 by darismen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,25 +44,31 @@ void Cap::execute(Client* client, std::vector<std::string> args)
 //MARK: Pass
 void Pass::execute(Client* client, std::vector<std::string> args)
 {
-	(void)client;
-	if (args.size() < 1)
-		return;
-	// Set client password or validate
-	// For now, just accept it
+	if (args.size() == 0)
+		return void(_srv->sendResponse(ERR_NEEDMOREPARAMS(client->getNickname(), "WHO"), client->getSocketFd()));
+	
+	std::string key = args[0];
+
+	if (_srv->getpassword() != key)
+		_srv->close_client(client->getSocketFd(), "Wrong Password");
+	
 }
 //MARK: Who
 void Who::execute(Client* client, std::vector<std::string> args)
 {
-	if (args.size() == 0)
+	if (args.size() < 1)
 		return void(_srv->sendResponse(ERR_NEEDMOREPARAMS(client->getNickname(), "WHO"), client->getSocketFd()));
 	
 	std::string tgt_channel = args[0];
 	
 	Channel *channel = _srv->getChannel(tgt_channel);
 	if (!channel)
-		return void(_srv->sendResponse(ERR_NOSUCHNICK(client->getNickname(), tgt_channel), client->getSocketFd()));
-	// channel->broadcast(RPL_WHO(client, tgt_channel));
-	_srv->sendResponse(RPL_WHO(client, tgt_channel), client->getSocketFd());
+		return void(_srv->sendResponse(ERR_NOSUCHNICK(tgt_channel), client->getSocketFd()));
+		
+	const std::vector<std::string>& nicknames = channel->getNicknames();
+	for (std::vector<std::string>::const_iterator it = nicknames.begin(); it != nicknames.end(); it++)
+		_srv->sendResponse(RPL_WHOREPLY(tgt_channel, *it), client->getSocketFd());
+	_srv->sendResponse(RPL_ENDOFWHO(client), client->getSocketFd());
 }
 
 //MARK: Kick
@@ -83,7 +89,7 @@ void Kick::execute(Client* client, std::vector<std::string> args)
 	
 	Client *dest = _srv->getclient(target_user);
 	if (!dest)
-		return void(_srv->sendResponse(ERR_NOSUCHNICK(client->getNickname(), target_user), client->getSocketFd()));
+		return void(_srv->sendResponse(ERR_NOSUCHNICK(target_user), client->getSocketFd()));
 
 	std::set<std::string> dest_channels = dest->getChannels();
 	if (std::find(dest_channels.begin(), dest_channels.end(), tgt_channel) == dest_channels.end())
@@ -110,13 +116,20 @@ void	Invite::execute(Client* client, std::vector<std::string> args)
 	
 	Client *dest = _srv->getclient(target_user);
 	if (!dest)
-		return void(_srv->sendResponse(ERR_NOSUCHNICK(client->getNickname(), target_user), client->getSocketFd()));
+		return void(_srv->sendResponse(ERR_NOSUCHNICK(target_user), client->getSocketFd()));
 
 	std::set<std::string> dest_channels = dest->getChannels();
 	if (std::find(dest_channels.begin(), dest_channels.end(), tgt_channel) != dest_channels.end())
 		return void(_srv->sendResponse(ERR_ALREADYINCHANNEL(target_user, tgt_channel), client->getSocketFd()));
 	
 	Channel *channel = _srv->getChannel(tgt_channel);
+	if (channel->getModeValue('i') && !channel->isClientAdmin(client)) //Check Mode and Admin Priviledges
+		return void(_srv->sendResponse(ERR_CHANOPRIVSNEEDED(client->getNickname(), tgt_channel), client->getSocketFd()));
+
+	if (channel->getModeValue('l') && channel->getNicknames().size() >= channel->getLimit())
+		return void(_srv->sendResponse(ERR_CHANNELISFULL(client->getNickname(), tgt_channel), client->getSocketFd()));
+
+	
 	channel->add_client(dest);
 	dest->joinChannel(tgt_channel);
 	_srv->sendResponse(RPL_JOIN(dest, tgt_channel), dest->getSocketFd());
@@ -134,16 +147,21 @@ void	Topic::execute(Client* client, std::vector<std::string> args)
 	Channel *channel = _srv->getChannel(tgt_channel);
 
 	if (!channel)
-		return void(_srv->sendResponse(ERR_NOSUCHCHANNEL(client->getNickname(), tgt_channel), client->getSocketFd()));
+		return void(_srv->sendResponse(ERR_NOSUCHCHANNEL(tgt_channel), client->getSocketFd()));
 	
+	if (channel->getModeValue('t') && !channel->isClientAdmin(client))
+		return void(_srv->sendResponse(ERR_CHANOPRIVSNEEDED(client->getNickname(), tgt_channel), client->getSocketFd()));
+
 	if (!message.empty())
 	{
 		channel->setTopic(message);
-		channel->broadcast(RPL_TOPIC(client, tgt_channel, message));
+		channel->broadcast(RPL_TOPIC(tgt_channel, message));
 	}
+	else if (message == ":")
+		channel->broadcast(RPL_NOTOPIC(tgt_channel));
 	else
 	{
-		_srv->sendResponse(RPL_TOPIC(client, tgt_channel, channel->getTopic()), client->getSocketFd());
+		_srv->sendResponse(RPL_TOPIC(tgt_channel, channel->getTopic()), client->getSocketFd());
 	}
 }
 
@@ -154,53 +172,83 @@ void	Mode::execute(Client* client, std::vector<std::string> args)
 	if (args.size() < 2)
 		return void(_srv->sendResponse(ERR_NEEDMOREPARAMS(client->getNickname(), "MODE"), client->getSocketFd()));
 	
-	std::string target = args[0];
-	Channel* channel = _srv->getChannel(target);
+	std::string tgt_channel = args[0];
+	Channel* channel = _srv->getChannel(tgt_channel);
 	if (!channel)
-		return void(_srv->sendResponse(ERR_NOSUCHCHANNEL(client->getNickname(), target), client->getSocketFd()));
+		return void(_srv->sendResponse(ERR_NOSUCHCHANNEL(tgt_channel), client->getSocketFd()));
 	if (!channel->isClientAdmin(client))
-		return void(_srv->sendResponse(ERR_CHANOPRIVSNEEDED(client->getNickname(), target), client->getSocketFd()));
+		return void(_srv->sendResponse(ERR_CHANOPRIVSNEEDED(client->getNickname(), tgt_channel), client->getSocketFd()));
 	
 	for (size_t i = 1; i < args.size(); i++)
 	{
-		if (args[i].length() > 1 && channel->hasMode(args[i][1]))
+		if (args[i].length() == 2 && channel->hasMode(args[i][1]))
 		{
 			if (args[i][0] == '+')
 				channel->setMode(args[i][1], true);
 			else
 				channel->setMode(args[i][1], false);
+
+			_srv->sendResponse(RPL_MODE(client, tgt_channel, args[i]), client->getSocketFd());
+			
+			if (std::string("lkob").find(args[i][1]))
+				{change_sub(client, channel, args[i], args[i+1]); i++;} //Grab sub parameter and skip its iteration
+			
 		}
-		_srv->sendResponse(RPL_MODE(client, target, args[i]), client->getSocketFd());
-		//TODO DEFINE BEHAVIOUR FOR OPTIONAL PARAMS LIKE +l 10
+		else
+			_srv->sendResponse(ERR_UMODEUNKNOWNFLAG, client->getSocketFd());
 	}
+}
+
+void	Mode::change_sub(Client *client, Channel *channel, std::string mode, std::string arg)
+{
+	char m = mode[0];
+	switch(m)
+	{
+		case 'l': channel->setLimit(std::atoi(arg.c_str())); break;
+		case 'k': channel->setKey(arg); break;
+		case 'o':
+			Client *candidate = channel->getClient(arg);
+			if (candidate != NULL)
+				channel->add_admin(candidate);
+			else
+				_srv->sendResponse(ERR_NOSUCHNICK(candidate->getNickname()), client->getSocketFd());
+			break;
+	}
+	
 }
 
 /**
  * MARK: Join
  * @param: JOIN args: *client, <channel>
+ * @param: JOIN args: *client, <channel> <key>
  */
 void	Join::execute(Client* client, std::vector<std::string> args)
 {
 	if (args.size() < 1)
 		return void(_srv->sendResponse(ERR_NEEDMOREPARAMS(client->getNickname(), "Join"), client->getSocketFd()));
-
+	
 	std::string tgt_channel = args[0];
-
+	std::string key = (args.size() > 1 && !args[1].empty()) ? args[1] : "";
+	
+	std::cout << "JOIN CHECK" << std::endl;
 	std::set<std::string> channels = client->getChannels();
 	if (std::find(channels.begin(), channels.end(), tgt_channel) != channels.end())
 		return void(_srv->sendResponse(ERR_ALREADYINCHANNEL(client->getNickname(), tgt_channel), client->getSocketFd()));
 	
 	
 	Channel *channel = _srv->getChannel(tgt_channel);
-	// std::cout << channel << std::endl;
 	if (channel == 0)
 	{
-		channel = new Channel(tgt_channel, "", client, _srv);
+		channel = new Channel(tgt_channel, key, client, _srv);
 		_srv->add_Channel(channel);
 	}
+	if (channel->getModeValue('i') && !channel->isClientAdmin(client))
+		return void(_srv->sendResponse(ERR_CHANOPRIVSNEEDED(client->getNickname(), tgt_channel), client->getSocketFd()));
+
 	channel->add_client(client);
 	client->joinChannel(tgt_channel);
 	_srv->sendResponse(RPL_JOIN(client, tgt_channel), client->getSocketFd());
+	_srv->sendResponse(RPL_TOPIC(tgt_channel, channel->getTopic()), client->getSocketFd());
 }
 
 //MARK: PART
@@ -217,6 +265,8 @@ void	Part::execute(Client* client, std::vector<std::string> args)
 		return void(_srv->sendResponse(ERR_NOTONCHANNEL(client->getNickname(), tgt_channel), client->getSocketFd()));
 
 	Channel *channel = _srv->getChannel(tgt_channel);
+	if (!channel)
+		return void(_srv->sendResponse(ERR_NOSUCHCHANNEL(tgt_channel), client->getSocketFd()));
 	channel->remove_client(client);
 	client->leaveChannel(tgt_channel);
 	_srv->sendResponse(RPL_PART(client, tgt_channel), client->getSocketFd());
@@ -266,14 +316,14 @@ void	PrivMsg::execute(Client* client, std::vector<std::string> args)
 		tgt_channel = args[0];
 		Channel *dest_channel = _srv->getChannel(tgt_channel);
 		if (!dest_channel)
-			return void(_srv->sendResponse(ERR_NOSUCHNICK(client->getNickname(), target), client->getSocketFd()));
-		dest_channel->broadcast(RPL_PRIVMSG(client, tgt_channel, message));
+			return void(_srv->sendResponse(ERR_NOSUCHCHANNEL(target), client->getSocketFd()));
+		dest_channel->broadcast(RPL_PRIVMSG(client, tgt_channel, message), client);
 	}
 	else
 	{
 		Client *dest = _srv->getclient(target);
 		if (!dest)
-			return void(_srv->sendResponse(ERR_NOSUCHNICK(client->getNickname(), target), client->getSocketFd()));
+			return void(_srv->sendResponse(ERR_NOSUCHNICK(target), client->getSocketFd()));
 		
 		_srv->sendResponse(RPL_PRIVMSG(client, target, message), dest->getSocketFd());
 	}
@@ -283,31 +333,36 @@ void	PrivMsg::execute(Client* client, std::vector<std::string> args)
 // args: <param> <:trailing>
 void	Notice::execute(Client* client, std::vector<std::string> args)
 {
-	if (args.size() < 2 || args[0].empty() || args[1].empty())
-		return void(_srv->sendResponse(ERR_NEEDMOREPARAMS(client->getNickname(), "Notice"), client->getSocketFd()));
-	
 	std::string tgt_channel;
 	std::string message;
-	// std::vector<std::string>::iterator it = args.begin();
-	if (args[0][0] == '#')
+	try
 	{
-		tgt_channel = args[0];
-		message = (args.size() > 1) ? args[1] : "";
-	}
-	else
-	{
-		std::set<std::string> channels = client->getChannels();
-		if (channels.empty())
-			return void(_srv->sendResponse(ERR_NOTONCHANNEL(client->getNickname(), ""), client->getSocketFd()));
-		tgt_channel =  *channels.rbegin();
-		message = args[0];
-	}
+		if (args.size() < 1 || args[0].empty())
+			throw ERR_NEEDMOREPARAMS(client->getNickname(), "Notice");
 	
-	Channel *channel = _srv->getChannel(tgt_channel);
-	if (!channel)
-		return void(_srv->sendResponse(ERR_NOSUCHCHANNEL(client->getNickname(), tgt_channel), client->getSocketFd()));
+		if (args[0][0] == '#')
+		{
+			tgt_channel = args[0];
+			message = (args.size() > 1) ? args[1] : "";
+		}
+		else
+		{
+			std::set<std::string> channels = client->getChannels();
+			if (channels.empty())
+				throw ERR_NOTONCHANNEL(client->getNickname(), tgt_channel);
+			tgt_channel =  *channels.rbegin();
+			message = args[0];
+		}
+		Channel *channel = _srv->getChannel(tgt_channel);
+		if (!channel)
+			throw ERR_NOSUCHCHANNEL(tgt_channel);
 
-	channel->broadcast(RPL_NOTICE(client, tgt_channel, message));
+		channel->broadcast(RPL_NOTICE(client, tgt_channel, message));
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << e.what() << '\n';
+	}
 }
 
 //MARK: PING

@@ -6,7 +6,7 @@
 /*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/19 16:52:12 by darismen          #+#    #+#             */
-/*   Updated: 2026/01/27 12:50:38 by darismen         ###   ########.fr       */
+/*   Updated: 2026/01/31 14:25:28 by darismen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,10 @@ void	invoke(Server *srv, Parser *prs, Client* client, std::string command,
 		std::vector<std::string> params)
 {
 		const std::map<std::string, Command*>& commands = prs->getCommands();
+		if (command == "302")
+			command = "USERHOST";
+		if (command == "234")
+			command = "SERVLIST";
 		std::map<std::string, Command*>::const_iterator it = commands.find(command);
 		if (it == commands.end())
 			return void(srv->sendResponse("421 " + client->getNickname() + " " + command + " :Unknown command", client->getSocketFd()));

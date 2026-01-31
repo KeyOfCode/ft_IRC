@@ -24,3 +24,13 @@
 
 		TODO: Crear el PASS command, hacer que funcione con netcat y irssi, 
 		connectar distintos ordenadores.
+
+29/01 darismen:
+		Hay que arreglar WHO, NICK, USER, PASS
+		Hay que agregar condicionales de modo de canal y privilegios de operador a varios
+			commandos, como INVITE, MODE, KICK
+
+31/01 darismen:
+		TODO Agregar commandos USERHOST y SERVLIST
+		Mode y condicionales aun no funcionan.
+		Agregado commando Pass

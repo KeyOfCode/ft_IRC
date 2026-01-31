@@ -6,7 +6,7 @@
 /*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/19 15:58:30 by darismen          #+#    #+#             */
-/*   Updated: 2026/01/13 13:21:17 by darismen         ###   ########.fr       */
+/*   Updated: 2026/01/31 13:32:14 by darismen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ class Command
 		virtual void execute(Client* client, std::vector<std::string> args) = 0;
 };
 
+//MARK: Cap
 class Cap : public Command
 {
 	public:
@@ -46,6 +47,7 @@ class Cap : public Command
 		void execute(Client* client, std::vector<std::string> args);
 };
 
+//MARK: Pass
 class Pass : public Command
 {
 	public:
@@ -54,6 +56,7 @@ class Pass : public Command
 		void execute(Client* client, std::vector<std::string> args);
 };
 
+//MARK: Who
 class Who : public Command
 {
 	public:
@@ -65,6 +68,7 @@ class Who : public Command
 #pragma region Operator Commands
 //Operator Commands
 
+//MARK: Kick
 class Kick : public Command
 {
 	public:
@@ -74,6 +78,7 @@ class Kick : public Command
 		void execute(Client* client, std::vector<std::string> args);
 };
 
+//MARK: Invite
 class Invite : public Command
 {
 	public:
@@ -83,6 +88,7 @@ class Invite : public Command
 		void execute(Client* client, std::vector<std::string> args);
 };
 
+//MARK: Topic
 class Topic : public Command
 {
 	public:
@@ -92,6 +98,7 @@ class Topic : public Command
 		void execute(Client* client, std::vector<std::string> args);
 };
 
+//MARK: Mode
 class Mode : public Command
 {
 	public:
@@ -99,6 +106,7 @@ class Mode : public Command
 		~Mode() {}
 
 		void execute(Client* client, std::vector<std::string> args);
+		void change_sub(Client *client, Channel *channel, std::string mode, std::string arg);
 };
 
 #pragma endregion
@@ -109,6 +117,7 @@ class Mode : public Command
 
 // JOIN, PART, NICK, USER, PRIVMSG, NOTICE
 
+//MARK: Join
 class Join : public Command
 {
 	public:
@@ -118,6 +127,7 @@ class Join : public Command
 		void execute(Client* client, std::vector<std::string> args);
 };
 
+//MARK: Part
 class Part : public Command
 {
 	public:
@@ -127,7 +137,8 @@ class Part : public Command
 		void execute(Client* client, std::vector<std::string> args);
 };
 
-//Nicknames
+//Nick
+//MARK: Nicknames
 class Nick : public Command
 {
 	public:
@@ -137,6 +148,7 @@ class Nick : public Command
 		void execute(Client* client, std::vector<std::string> args);
 };
 
+//MARK: User
 class User : public Command
 {
 	public:
@@ -146,6 +158,7 @@ class User : public Command
 		void execute(Client* client, std::vector<std::string> args);
 };
 
+//MARK: PrivMsg
 class PrivMsg : public Command
 {
 	public:
@@ -153,9 +166,9 @@ class PrivMsg : public Command
 		~PrivMsg() {}
 
 		void execute(Client* client, std::vector<std::string> args);
-		void execute(Client* client, std::vector<std::string> args, std::vector<std::string> trailing);
 };
 
+//MARK: Notice
 class Notice : public Command
 {
 	public:
@@ -168,6 +181,7 @@ class Notice : public Command
 
 #pragma endregion
 
+//MARK: Ping
 class Ping : public Command
 {
 	public:
@@ -178,6 +192,7 @@ class Ping : public Command
 		void    execute(Client* client, std::vector<std::string> args);
 };
 
+//MARK: Pong
 class Pong : public Command
 {
 	public:

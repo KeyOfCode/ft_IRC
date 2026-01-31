@@ -31,6 +31,9 @@ $(OBJ_DIR):
 
 exe:
 	@make
+	./$(NAME) 6667 1234
+test:
+	@make
 	./$(NAME) 1234 1234
 
 clean:

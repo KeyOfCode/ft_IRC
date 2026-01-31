@@ -6,7 +6,7 @@
 /*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/10 08:59:25 by paromero          #+#    #+#             */
-/*   Updated: 2025/12/17 19:27:10 by darismen         ###   ########.fr       */
+/*   Updated: 2026/01/31 15:06:26 by darismen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,6 +88,8 @@ class Server
 		void			stop();											//done clean de Server
 		void			close_client(int fd, std::string reason);		//done close the client
 		void			sendResponse(const std::string& response, int fd);  //done send messages.
+		
+	public:
 		std::string		getpassword();
 		
 };

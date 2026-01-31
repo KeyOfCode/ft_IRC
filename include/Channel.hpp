@@ -6,7 +6,7 @@
 /*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/09 13:30:09 by darismen          #+#    #+#             */
-/*   Updated: 2026/01/27 13:01:48 by darismen         ###   ########.fr       */
+/*   Updated: 2026/01/31 14:11:10 by darismen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,7 @@ class Channel
 		std::string					getName() const;
 		
 		std::vector<Client *>		getAdminList() const;
+		std::vector<Client *>		getClientList() const;
 		
 		std::string					getKey() const;
 		std::string					getTopic() const;
@@ -55,6 +56,8 @@ class Channel
 
 		size_t                      getSize() const;
 		std::vector<std::string>    getNicknames();
+
+		bool						getModeValue(char c) const;
 
 
 		/* Setters */
@@ -77,6 +80,7 @@ class Channel
 		
 		bool	isClientMember(Client*);
 		bool	isClientAdmin(Client*);
+		Client*	getClient(std::string);
 		bool	hasMode(char);
 
 
