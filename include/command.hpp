@@ -6,7 +6,7 @@
 /*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/19 15:58:30 by darismen          #+#    #+#             */
-/*   Updated: 2026/01/31 13:32:14 by darismen         ###   ########.fr       */
+/*   Updated: 2026/02/08 14:20:17 by darismen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,24 @@ class Cap : public Command
 	public:
 		Cap(Server *srv) : Command(srv) {}
 		~Cap() {}
+		void execute(Client* client, std::vector<std::string> args);
+};
+
+//MARK: Servlist
+class Servlist : public Command
+{
+	public:
+		Servlist(Server *srv) : Command(srv) {}
+		~Servlist() {}
+		void execute(Client* client, std::vector<std::string> args);
+};
+
+//MARK: Userhost
+class Userhost : public Command
+{
+	public:
+		Userhost(Server *srv) : Command(srv) {}
+		~Userhost() {}
 		void execute(Client* client, std::vector<std::string> args);
 };
 

@@ -6,7 +6,7 @@
 /*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/10 10:39:51 by paromero          #+#    #+#             */
-/*   Updated: 2026/01/31 15:07:27 by darismen         ###   ########.fr       */
+/*   Updated: 2026/02/08 17:45:39 by darismen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -171,6 +171,11 @@ void		Server::add_Channel(Channel * new_channel)
 		this->channels_.insert(new_channel);
 	else
 		std::cout << "Channel already exists" << std::endl;
+}
+
+void	Server::del_Channel(Channel *channel)
+{
+	channels_.erase(channel);
 }
 
 /*
@@ -344,6 +349,16 @@ void	Server::handle_write(int fd) {
 //MARK: close_client
 void	Server::close_client(int fd, std::string reason) {
 	std::cout << "Closing client " << fd << " because of : " << reason << std::endl;
+
+	Client *cli = this->getclient(fd);
+	std::set<Channel *> channel_list = this->get_all_Channels();
+	std::set<Channel *>::iterator set_it = channel_list.begin();
+	for (; set_it != channel_list.end(); set_it++)
+	{
+		(*set_it)->remove_invited(cli);
+		(*set_it)->remove_admin(cli);
+		(*set_it)->remove_client(cli);
+	}
 	
 	std::map<int, Client*>::iterator it = clients_.find(fd);
 	if (it != clients_.end()) {

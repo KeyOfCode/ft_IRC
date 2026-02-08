@@ -6,7 +6,7 @@
 /*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/09 13:30:09 by darismen          #+#    #+#             */
-/*   Updated: 2026/01/31 14:11:10 by darismen         ###   ########.fr       */
+/*   Updated: 2026/02/08 18:05:35 by darismen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ class Channel
 		Server*					_srv;
 		std::vector<Client *>	_admins;
 		std::vector<Client *>	_clients;
+		std::vector<Client *>	_invited;
 		std::map<char, bool>	_modes;
 
 		std::string             _key; // channel key
@@ -49,6 +50,7 @@ class Channel
 		
 		std::vector<Client *>		getAdminList() const;
 		std::vector<Client *>		getClientList() const;
+		std::vector<Client *>		getInvitedList() const;
 		
 		std::string					getKey() const;
 		std::string					getTopic() const;
@@ -56,6 +58,7 @@ class Channel
 
 		size_t                      getSize() const;
 		std::vector<std::string>    getNicknames();
+		std::map<char, bool>		&getAllModes();
 
 		bool						getModeValue(char c) const;
 
@@ -77,9 +80,12 @@ class Channel
 		void	remove_client(Client*);
 		void	add_admin(Client*);
 		void	remove_admin(Client*);
+		void	add_invited(Client*);
+		void	remove_invited(Client*);
 		
 		bool	isClientMember(Client*);
 		bool	isClientAdmin(Client*);
+		bool	isClientInvited(Client*);
 		Client*	getClient(std::string);
 		bool	hasMode(char);
 

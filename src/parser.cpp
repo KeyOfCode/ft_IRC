@@ -6,7 +6,7 @@
 /*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/19 16:52:12 by darismen          #+#    #+#             */
-/*   Updated: 2026/01/31 14:25:28 by darismen         ###   ########.fr       */
+/*   Updated: 2026/02/08 15:41:44 by darismen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,8 @@ Parser::Parser(Server* srv) : _srv(srv)
 	
 	_commands["CAP"] = new Cap(_srv);
 	_commands["PASS"] = new Pass(_srv);
+	_commands["SERVLIST"] = new Servlist(_srv);
+	_commands["USERHOST"] = new Userhost(_srv);
 	
 	_commands["JOIN"] = new Join(_srv);
 	_commands["PART"] = new Part(_srv);

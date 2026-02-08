@@ -34,3 +34,15 @@
 		TODO Agregar commandos USERHOST y SERVLIST
 		Mode y condicionales aun no funcionan.
 		Agregado commando Pass
+
+07/02 darismen:
+		Join funciona, Mode parace funcionar
+		
+08/02 darismen:
+		INVITE necesita condicon de password (k)
+		INVITE no puede añadir al destino, se añade a una lista de invite para que el destion haga Join
+		Cuando un cliente entra al canal, es borrado de la lista invited
+		Lista de Admins, siempre debe hjaber un admin, si el original deja el canal, asignar al primero en la lista
+			de clientes
+		Canal no puede ser solo "#" como nombre
+		Canales vacios deben ser borrados.

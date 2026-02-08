@@ -6,7 +6,7 @@
 /*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/10 08:59:25 by paromero          #+#    #+#             */
-/*   Updated: 2026/01/31 15:06:26 by darismen         ###   ########.fr       */
+/*   Updated: 2026/02/08 17:41:11 by darismen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,6 +81,7 @@ class Server
 		std::set<Channel *>		get_all_Channels();
 		
 		void			add_Channel(Channel * new_channel);
+		void			del_Channel(Channel * channel);
 		
 		static 	void	handle_signal(int sig);							//done handle the shutdown from a signal
 		void			init();											//done init the viariables
