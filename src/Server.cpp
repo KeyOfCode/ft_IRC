@@ -6,7 +6,7 @@
 /*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/10 10:39:51 by paromero          #+#    #+#             */
-/*   Updated: 2026/02/08 17:45:39 by darismen         ###   ########.fr       */
+/*   Updated: 2026/02/09 11:03:35 by darismen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -257,8 +257,8 @@ void	Server::handle_read(int fd) {
 	}
 	if (n < 0) {
 		//! no data
-		if (errno == EAGAIN || errno == EWOULDBLOCK)
-			return; //! no es un error, solo no hay datos
+		// if (errno == EAGAIN || errno == EWOULDBLOCK)
+			// return; //! no es un error, solo no hay datos
 		std::cerr << "recv error fd " << fd << ": " << strerror(errno) << std::endl;
 		close_client(fd, "recv error");
 		return;
@@ -338,8 +338,8 @@ void	Server::handle_write(int fd) {
 	}
 
 	else if (sent < 0) {
-		if (errno == EAGAIN || errno == EWOULDBLOCK) //- socket not ready, try later
-			return;
+		// if (errno == EAGAIN || errno == EWOULDBLOCK) //- socket not ready, try later
+			// return;
 		//- Error, close client - strerror transform errno to readable text
 		std::cerr << "send error fd " << fd << ": " << strerror(errno) << std::endl;
 		close_client(fd, "Send error");

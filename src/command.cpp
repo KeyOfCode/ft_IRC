@@ -6,7 +6,7 @@
 /*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/08 18:32:33 by darismen          #+#    #+#             */
-/*   Updated: 2026/02/08 18:02:30 by darismen         ###   ########.fr       */
+/*   Updated: 2026/02/09 11:01:33 by darismen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -157,10 +157,10 @@ void	Invite::execute(Client* client, std::vector<std::string> args)
 
 	
 	channel->add_invited(dest);
-	// dest->joinChannel(tgt_channel);
 	_srv->sendResponse(RPL_INVITING(dest, tgt_channel), dest->getSocketFd());
 	_srv->sendResponse(RPL_INVITING(dest, tgt_channel), client->getSocketFd());
 }
+
 // MARK: Topic
 // syntax: Topic <msgtarget> <message>
 void	Topic::execute(Client* client, std::vector<std::string> args)
