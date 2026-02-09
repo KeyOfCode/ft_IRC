@@ -6,7 +6,7 @@
 /*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/08 18:32:33 by darismen          #+#    #+#             */
-/*   Updated: 2026/02/09 11:01:33 by darismen         ###   ########.fr       */
+/*   Updated: 2026/02/09 12:26:57 by darismen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,8 +53,6 @@ void Userhost::execute(Client* client, std::vector<std::string> args)
 	if (args.size() == 0)
 		return void(_srv->sendResponse(RPL_USERHOST(client), client->getSocketFd()));
 
-	// (void)client;
-	// (void)args;
 	for (size_t i = 0; i < args.size(); i++)
 	{
 		Client *target = _srv->getclient(args[i]);
@@ -87,7 +85,7 @@ void Who::execute(Client* client, std::vector<std::string> args)
 	
 	Channel *channel = _srv->getChannel(tgt_channel);
 	if (!channel)
-		return void(_srv->sendResponse(ERR_NOSUCHNICK(tgt_channel), client->getSocketFd()));
+		return void(_srv->sendResponse(ERR_NOSUCHCHANNEL(tgt_channel), client->getSocketFd()));
 		
 	const std::vector<std::string>& nicknames = channel->getNicknames();
 	for (std::vector<std::string>::const_iterator it = nicknames.begin(); it != nicknames.end(); it++)
@@ -298,23 +296,28 @@ void	Join::execute(Client* client, std::vector<std::string> args)
 	std::string key = (args.size() > 1 && !args[1].empty()) ? args[1] : "";
 	
 	Channel *channel = _srv->getChannel(tgt_channel);
-
+	
 	if (channel == 0)
 	{
 		channel = new Channel(tgt_channel, key, client, _srv);
 		_srv->add_Channel(channel);
+		client->joinChannel(tgt_channel);
 	}
-	
-	if (channel->getModeValue('i') && !channel->isClientInvited(client))
-		return void(_srv->sendResponse(ERR_INVITEONLYCHAN(client->getNickname(), tgt_channel), client->getSocketFd()));
-	if (channel->getModeValue('k') && key != channel->getKey())
-		return void(_srv->sendResponse(ERR_BADCHANNELKEY(client->getNickname(), tgt_channel), client->getSocketFd()));
-	if (channel->getModeValue('l') && channel->getNicknames().size() >= channel->getLimit())
-		return void(_srv->sendResponse(ERR_CHANNELISFULL(client->getNickname(), tgt_channel), client->getSocketFd()));
+	else
+	{
+		if (channel->getModeValue('i') && !channel->isClientInvited(client))
+			return void(_srv->sendResponse(ERR_INVITEONLYCHAN(client->getNickname(), tgt_channel), client->getSocketFd()));
+		if (channel->getModeValue('k') && key != channel->getKey())
+			return void(_srv->sendResponse(ERR_BADCHANNELKEY(client->getNickname(), tgt_channel), client->getSocketFd()));
+		if (channel->getModeValue('l') && channel->getNicknames().size() >= channel->getLimit())
+			return void(_srv->sendResponse(ERR_CHANNELISFULL(client->getNickname(), tgt_channel), client->getSocketFd()));
+		if (channel->isClientMember(client))
+			return void(_srv->sendResponse(ERR_ALREADYINCHANNEL(client->getNickname(), channel->getName()), client->getSocketFd()));
+		channel->remove_invited(client);
+		channel->add_client(client);
+		client->joinChannel(tgt_channel);
+	}
 
-	channel->remove_invited(client);
-	channel->add_client(client);
-	client->joinChannel(tgt_channel);
 	_srv->sendResponse(RPL_JOIN(client, tgt_channel), client->getSocketFd());
 	_srv->sendResponse(RPL_TOPIC(tgt_channel, channel->getTopic()), client->getSocketFd());
 	

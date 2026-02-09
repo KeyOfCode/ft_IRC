@@ -6,7 +6,7 @@
 /*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/10 08:59:25 by paromero          #+#    #+#             */
-/*   Updated: 2026/02/08 17:41:11 by darismen         ###   ########.fr       */
+/*   Updated: 2026/02/09 12:20:04 by darismen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,13 +36,6 @@ class Client;
 
 class Parser;
 
-// struct IRCMessage {
-//     std::string prefix;
-//     std::string command;
-//     std::vector<std::string> params;
-//     std::string trailing;
-// };
-
 class Server
 {
 	
@@ -62,17 +55,15 @@ class Server
 		Parser*				parser_;
 		
 		//? methods
-		int		find_poll_index(int fd);				//done find index of fd in pollfds_ vector
-		void	accept_new_clients();					//todo create new clients and assigns to client y pollfd
-		void	handle_read(int fd);					//todo read data of a client
-		void	handle_write(int fd);					//todo 
+		int		find_poll_index(int fd);
+		void	accept_new_clients();	
+		void	handle_read(int fd);	
+		void	handle_write(int fd);	
 		
 		
 		public:
 		Server(char **av);
 		~Server();
-		// Server(const Server& other);
-		// Server& operator=(const Server& other);
 		
 		Client*			getclient(int fd);
 		Client*			getclient(std::string name);
@@ -83,12 +74,12 @@ class Server
 		void			add_Channel(Channel * new_channel);
 		void			del_Channel(Channel * channel);
 		
-		static 	void	handle_signal(int sig);							//done handle the shutdown from a signal
-		void			init();											//done init the viariables
-		void			run();											//done main loop
-		void			stop();											//done clean de Server
-		void			close_client(int fd, std::string reason);		//done close the client
-		void			sendResponse(const std::string& response, int fd);  //done send messages.
+		static 	void	handle_signal(int sig);							
+		void			init();											
+		void			run();											
+		void			stop();											
+		void			close_client(int fd, std::string reason);		
+		void			sendResponse(const std::string& response, int fd);  
 		
 	public:
 		std::string		getpassword();

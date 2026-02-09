@@ -6,7 +6,7 @@
 /*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/09 14:05:47 by darismen          #+#    #+#             */
-/*   Updated: 2026/02/08 18:05:35 by darismen         ###   ########.fr       */
+/*   Updated: 2026/02/09 12:27:41 by darismen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,10 +90,6 @@ void	Channel::broadcast(const std::string& message, Client* exclude)
 //MARK: The Clients
 void	Channel::add_client(Client* client)
 {	
-	if (this->isClientMember(client))
-		return void(_srv->sendResponse(ERR_ALREADYINCHANNEL(client->getNickname(), this->getName()), client->getSocketFd()));
-	if (this->getSize() >= this->getLimit())
-		return void(_srv->sendResponse(ERR_CHANNELISFULL(client->getNickname(), this->getName()), client->getSocketFd()));
 	_clients.push_back(client);
 }
 
@@ -180,10 +176,6 @@ bool	Channel::isClientInvited(Client* client)
 		return true;
 	return false;
 }
-// client_it it = this->_admins.begin();
-// for (; it != this->_admins.end(); it++)
-// 	if ((*it) == client)
-// 		return true;
 
 void	Channel::kick(Client* client, Client* target, const std::string& reason)
 {

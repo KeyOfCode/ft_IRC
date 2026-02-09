@@ -6,7 +6,7 @@
 /*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/10 10:39:51 by paromero          #+#    #+#             */
-/*   Updated: 2026/02/09 11:03:35 by darismen         ###   ########.fr       */
+/*   Updated: 2026/02/09 12:19:07 by darismen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,25 +39,6 @@ Server::~Server()
 		delete *it;
 	}
 }
-
-/* Server::Server(const Server& other) {
-	this->port_ = other.port_;
-	this->pswd_ = other.pswd_;
-	this->serSocket_ = other.serSocket_;
-	this->signal_ = other.signal_;
-	this->pollfds_ = other.pollfds_;
-}
-
-Server& Server::operator=(const Server& other) {
-	if (this != &other) {
-		this->port_ = other.port_;
-		this->pswd_ = other.pswd_;
-		this->serSocket_ = other.serSocket_;
-		this->signal_ = other.signal_;
-		this->pollfds_ = other.pollfds_;
-	}
-	return *this;
-} */
 
 //MARK: Init
 void	Server::init() {
@@ -105,12 +86,7 @@ void	Server::sendResponse(const std::string& response, int fd)
 	int idx = find_poll_index(fd);
 	if (idx != -1)
 		pollfds_[idx].events |= POLLOUT;
-	// ssize_t sent = send(fd, msg.c_str(), msg.length(), 0);
-	// if (sent == -1) {
-	// 	std::cerr << "Send error for fd " << fd << ": " << strerror(errno) << std::endl;
-	// } else {
-	// 	std::cout << "Sent " << sent << " bytes to fd " << fd << ": " << msg;
-	// }
+
 }
 //MARK: getpassword
 std::string	Server::getpassword() {
@@ -238,7 +214,6 @@ void	Server::accept_new_clients() {
 	newFD.events = POLLIN;
 	newFD.revents = 0;
 	pollfds_.push_back(newFD);
-	//DEBUG std::cout << "Client connected: FD=" << clientsocket_ << " Host=" << newclient->getHostname() << std::endl;
 }
 
 //MARK: handle_read
@@ -267,7 +242,7 @@ void	Server::handle_read(int fd) {
 	std::cout << "Received " << n << " bytes from fd " << fd << std::endl;
 	
 	client->appendToRecvBuffer(data);
-	//! password management
+	// ! password management
 	if (!client->getPass()) {	
 		if (client->getRecvBuffer().find("PASS") != std::string::npos) {
 			std::string line = client->getRecvBuffer();
@@ -288,16 +263,9 @@ void	Server::handle_read(int fd) {
 			}
 		}
 	}
-	
 	std::cout << "Message from client: " << client->getRecvBuffer() << std::endl;
 	std::cout << "returned recv: " << n << std::endl;
-	client->processBuffer(this,parser_,invoke);
-
-	
-
-
-	
-	//! hay clientes que pasan de primera info (irssi: CAP LS, NICK, USER, etc) y otros que no pasan nada (netcat, alias nc)
+	client->processBuffer(this, parser_, invoke);
 }
 
 //MARK: handle_write

@@ -6,7 +6,7 @@
 /*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/08 18:39:34 by darismen          #+#    #+#             */
-/*   Updated: 2026/02/08 17:30:33 by darismen         ###   ########.fr       */
+/*   Updated: 2026/02/09 12:26:56 by darismen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,15 +26,12 @@
 
 #define RPL_WELCOME(client)								"001: " + " :Welcome to the ft_irc network " + CLIENT_PREFIX(client)
 #define RPL_YOURHOST(server)							"002: " + " :Your host is <servername>"
-// #define RPL_CREATED(client)								"003 " + " :This server was created <date>"
 #define RPL_MYINFO(server)								"004: " + " :<servername> <available user modes> <available channel modes>"
 #define RPL_AWAY(clientNick)							"301: " + clientNick + " is away"
 #define RPL_USERHOST(client)							"302: " + CLIENT_PREFIX(client)
 
 #define RPL_WHOISUSER(client)							"311: " + CLIENT_PREFIX(client)
 #define RPL_WHOISOPERATOR(client)						"313: " + client->getNickname() + " :is an IRC operator"
-
-// #define RPL_CHANNELMODEIS(channel, mode, params)		"324 " + channel + " " + mode + " " + params
 
 //CMD_JOIN,        // :<nick>!<user>@<host> JOIN #channel
 

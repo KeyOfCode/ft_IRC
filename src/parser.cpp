@@ -6,7 +6,7 @@
 /*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/19 16:52:12 by darismen          #+#    #+#             */
-/*   Updated: 2026/02/08 15:41:44 by darismen         ###   ########.fr       */
+/*   Updated: 2026/02/09 12:14:49 by darismen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,17 +45,14 @@ Parser::~Parser()
 
 const std::map<std::string, Command *>& Parser::getCommands() const { return _commands; }
 
-/* std::string     Parser::trim(const std::string& str)
-{
-	
-} */
-
 //:Nickname!Username@Servername Cualquier cosa
 //:Nickname!Username@Servername CMD <params>
 
 void	invoke(Server *srv, Parser *prs, Client* client, std::string command,
 		std::vector<std::string> params)
 {
+		if (!client->getPass())
+			return void(srv->sendResponse("Need PASS", client->getSocketFd()));
 		const std::map<std::string, Command*>& commands = prs->getCommands();
 		if (command == "302")
 			command = "USERHOST";
@@ -63,7 +60,7 @@ void	invoke(Server *srv, Parser *prs, Client* client, std::string command,
 			command = "SERVLIST";
 		std::map<std::string, Command*>::const_iterator it = commands.find(command);
 		if (it == commands.end())
-			return void(srv->sendResponse("421 " + client->getNickname() + " " + command + " :Unknown command", client->getSocketFd()));
+			return void(srv->sendResponse(ERR_UNKNOWNCOMMAND(client->getNickname(), command), client->getSocketFd()));
 		
 		Command *cmd = it->second;
 		cmd->execute(client, params);
