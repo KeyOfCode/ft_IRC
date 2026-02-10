@@ -4,8 +4,8 @@ CPPFLAGS = -Wall -Wextra -Werror
 
 OBJ_DIR = objs
 OBJS = $(patsubst %.cpp, $(OBJ_DIR)/%.o, $(SRCS))
-SRCS = main.cpp src/Server.cpp src/client.cpp src/Channel.cpp src/parser.cpp src/command.cpp
-HEADERS = include/Server.hpp include/client.hpp include/command.hpp include/parser.hpp
+SRCS = main.cpp src/Server.cpp src/Client.cpp src/Channel.cpp src/Command.cpp src/Parser.cpp 
+HEADERS = include/Server.hpp include/Client.hpp  include/Channel.hpp include/Command.hpp include/Parser.hpp
 
 NAME = ircserv
 

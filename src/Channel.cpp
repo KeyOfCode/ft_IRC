@@ -6,13 +6,13 @@
 /*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/09 14:05:47 by darismen          #+#    #+#             */
-/*   Updated: 2026/02/09 12:27:41 by darismen         ###   ########.fr       */
+/*   Updated: 2026/02/10 13:24:50 by darismen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/Channel.hpp"
 #include "../include/Server.hpp"
-#include "../include/client.hpp"
+#include "../include/Client.hpp"
 
 Channel::Channel(const std::string &name, const std::string &key, Client* admin, Server *srv) :
 	_name(name),
@@ -143,8 +143,6 @@ void	Channel::remove_admin(Client* client)
 			{_admins.pop_back(); return ;}
 		else if (client != _admins[0] && _admins.size() > 1)
 			_admins.erase(std::remove(_admins.begin(), _admins.end(), client), _admins.end());
-		else
-			return void(_srv->sendResponse("Can't kick og_admin", client->getSocketFd()));
 		log(client->getNickname() + " lost admin priviledges from channel " + _name);
 	}
 }
@@ -159,8 +157,8 @@ bool	Channel::isClientAdmin(Client* client)
 //MARK: The invited
 void	Channel::add_invited(Client* client)
 {	
-	if (this->isClientInvited(client))
-		return void(_srv->sendResponse("Already Invited", client->getSocketFd()));
+	// if (this->isClientInvited(client))
+		// return void(_srv->sendResponse("Already Invited", client->getSocketFd()));
 	_invited.push_back(client);
 }
 

@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   command.hpp                                        :+:      :+:    :+:   */
+/*   Command.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/19 15:58:30 by darismen          #+#    #+#             */
-/*   Updated: 2026/02/08 14:20:17 by darismen         ###   ########.fr       */
+/*   Updated: 2026/02/10 12:24:15 by darismen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 #include <algorithm>
 #include <vector>
 
-#include "response.hpp"
+#include "Response.hpp"
 
 class Server;
 class Client;
@@ -80,6 +80,15 @@ class Who : public Command
 	public:
 		Who(Server *srv) : Command(srv) {}
 		~Who() {}
+		void execute(Client* client, std::vector<std::string> args);
+};
+
+//MARK: List
+class List : public Command
+{
+	public:
+		List(Server *srv) : Command(srv) {}
+		~List() {}
 		void execute(Client* client, std::vector<std::string> args);
 };
 

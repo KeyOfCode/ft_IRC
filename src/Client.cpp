@@ -1,5 +1,5 @@
-#include "../include/client.hpp"
-#include "../include/parser.hpp"
+#include "../include/Client.hpp"
+#include "../include/Parser.hpp"
 #include "../include/Server.hpp"
 #include <unistd.h>     // close(), write()
 #include <algorithm>    // std::min

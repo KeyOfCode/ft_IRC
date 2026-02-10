@@ -10,7 +10,7 @@ This project implements the core functionality of an IRC server, allowing multip
 
 ```bash
 	make
-	./ircserv <your IP> <port> <password>
+	./ircserv <port> <password>
 ```
 
 * `IP`: In Linux, use hostname -I
@@ -27,7 +27,7 @@ This project implements the core functionality of an IRC server, allowing multip
 
 * `PRIVMSG`: Sends a message to recipient
 * `NOTICE`: Sends a message to recipient (slightly different behavior)
-<!-- * `LIST`: Lists all the channels -->
+* `LIST`: Lists all the channels
 * `WHO` : Lists all the users in a channel
 * `TOPIC`: Show the topic of a channel
 * `JOIN`: Join a channel

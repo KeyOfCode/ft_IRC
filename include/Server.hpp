@@ -6,7 +6,7 @@
 /*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/10 08:59:25 by paromero          #+#    #+#             */
-/*   Updated: 2026/02/09 12:20:04 by darismen         ###   ########.fr       */
+/*   Updated: 2026/02/10 12:17:57 by darismen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,9 +26,9 @@
 #include <cstring>
 #include <netdb.h>
 #include <set>
-#include "client.hpp"
+#include "Client.hpp"
 #include "Channel.hpp"
-#include "parser.hpp"
+#include "Parser.hpp"
 
 class Channel;
 

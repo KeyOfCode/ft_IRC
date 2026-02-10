@@ -6,7 +6,7 @@
 /*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/09 13:30:09 by darismen          #+#    #+#             */
-/*   Updated: 2026/02/08 18:05:35 by darismen         ###   ########.fr       */
+/*   Updated: 2026/02/10 12:17:42 by darismen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 #include <vector>
 #include <map>
 
-#include "response.hpp"
+#include "Response.hpp"
 
 class Server;
 class Client;

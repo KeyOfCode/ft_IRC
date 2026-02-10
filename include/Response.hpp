@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   response.hpp                                       :+:      :+:    :+:   */
+/*   Response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/08 18:39:34 by darismen          #+#    #+#             */
-/*   Updated: 2026/02/09 12:26:56 by darismen         ###   ########.fr       */
+/*   Updated: 2026/02/10 13:21:47 by darismen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@
 //CMD_JOIN,        // :<nick>!<user>@<host> JOIN #channel
 
 #define RPL_JOIN(client, channel)						":" + CLIENT_PREFIX(client) + " JOIN :" + channel
-#define RPL_INVITING(client, channel)					"341: " + CLIENT_PREFIX(client) + " JOIN :" + channel
+#define RPL_INVITING(inviter, target, channel)          "341 " + inviter + " " + target + " " + channel
 #define RPL_PART(client, channel)                       ":" + CLIENT_PREFIX(client) + " PART :" + channel
 #define RPL_PRIVMSG(client, target, message)            ":" + CLIENT_PREFIX(client) + " PRIVMSG " + target + " :" + message
 #define RPL_QUIT(client, message)                       ":" + CLIENT_PREFIX(client) + " QUIT : " + message
@@ -45,11 +45,13 @@
 #define RPL_NOTICE(client, target, message)				":" + CLIENT_PREFIX(client) + " NOTICE " + target + " :" + message
 #define RPL_NOTOPIC(channel)            				"331: " + channel + " :No topic is set"
 #define RPL_TOPIC(channel, message)          			"332: TOPIC " + channel + " :" + message
-#define RPL_MODE(client, channel, modes)				":" + CLIENT_PREFIX(client) + " MODE " + channel + " " + modes
+#define RPL_MODE(client, channel, modes, param)			":" + CLIENT_PREFIX(client) + " MODE " + channel + " " + modes + " " + param
 #define RPL_CHANNELMODEIS(channel, modes)				"324: " + channel + " MODES " + modes
 
 #define RPL_WHOREPLY(channel, client)					"352: " + channel + " " + client
 #define RPL_ENDOFWHO(client)							"315: " + CLIENT_PREFIX(client) + " :End of WHO list"
+#define RPL_LIST(channel, modes, topic)					"322: " + channel + " Modes:" + modes + " Topic:" + topic
+#define RPL_LISTEND										"323: End of LIST"
 #define RPL_NAMREPLY(channel, client)					"353: = " + channel + " " + client
 #define RPL_ENDOFNAMES(channel)							"366: " + channel + " :End of NAMES list"
 #define RPL_SERVLIST									"234: Available services are: JOIN, MODE, KICK, PART, QUIT, PRIVMSG, NOTICE."

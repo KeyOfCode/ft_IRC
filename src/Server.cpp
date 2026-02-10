@@ -6,12 +6,12 @@
 /*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/10 10:39:51 by paromero          #+#    #+#             */
-/*   Updated: 2026/02/09 12:19:07 by darismen         ###   ########.fr       */
+/*   Updated: 2026/02/10 12:54:32 by darismen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/Server.hpp"
-#include "../include/parser.hpp"
+#include "../include/Parser.hpp"
 
 bool Server::signal_ = false;
 
@@ -250,7 +250,7 @@ void	Server::handle_read(int fd) {
 			size_t finalpos = line.find('\r', firstpos);
 			
 			if (finalpos == std::string::npos)
-				return;
+				return void(close_client(fd, "Empty Pass"));
 			finalpos = finalpos - firstpos;
 			std::string password = line.substr(firstpos, finalpos);
 			if (password != this->pswd_) {

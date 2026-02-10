@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parser.cpp                                         :+:      :+:    :+:   */
+/*   Parser.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/19 16:52:12 by darismen          #+#    #+#             */
-/*   Updated: 2026/02/09 12:14:49 by darismen         ###   ########.fr       */
+/*   Updated: 2026/02/10 12:40:17 by darismen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/parser.hpp"
+#include "../include/Parser.hpp"
 
 Parser::Parser(Server* srv) : _srv(srv)
 {
@@ -19,6 +19,7 @@ Parser::Parser(Server* srv) : _srv(srv)
 	_commands["TOPIC"] = new Topic(_srv);
 	_commands["MODE"] = new Mode(_srv);
 	_commands["WHO"] = new Who(_srv);
+	_commands["LIST"] = new List(_srv);
 	
 	_commands["CAP"] = new Cap(_srv);
 	_commands["PASS"] = new Pass(_srv);
