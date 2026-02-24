@@ -1,6 +1,7 @@
+> *This project has been created as part of the 42 curriculum by darismen, paromero, pjimenez*
+
 # *FT_IRC*
 
-> *This project has been created as part of the 42 curriculum by darismen, paromero, pjimenez*
 
 ## Description
 
