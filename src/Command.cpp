@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Command.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
+/*   By: paluja <paluja@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/08 18:32:33 by darismen          #+#    #+#             */
-/*   Updated: 2026/02/10 13:28:42 by darismen         ###   ########.fr       */
+/*   Updated: 2026/02/26 20:08:23 by paluja           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 #include "../include/Client.hpp"
 #include "../include/Server.hpp"
 #include "../include/Response.hpp"
+#include <algorithm>
 
 //MARK: Cap
 void Cap::execute(Client* client, std::vector<std::string> args)
@@ -248,7 +249,7 @@ void Mode::execute(Client* client, std::vector<std::string> args)
 		if (mode_char == '+') adding = true;
 		else if (mode_char == '-') adding = false;
 		else if (!channel->hasMode(mode_char))
-			_srv->sendResponse(ERR_UMODEUNKNOWNFLAG, client->getSocketFd());
+			_srv->sendResponse(ERR_INVALIDMODEPARAM(client->getNickname(), channel->getName(), std::string(1, mode_char)), client->getSocketFd());
 		else 
 		{
 			std::string flag = std::string(1, adding ? '+' : '-') + mode_char;
@@ -277,7 +278,22 @@ void	Mode::change_sub(Client *client, Channel *channel, std::string mode, std::s
 	char m = mode[1];
 	switch(m)
 	{
-		case 'l': channel->setLimit(std::atoi(arg.c_str())); break;
+		case 'l':
+			{
+				if (arg.empty() || !std::all_of(arg.begin(), arg.end(), ::isdigit))
+				{
+					_srv->sendResponse(ERR_INVALIDMODEPARAM(client->getNickname(), channel->getName(), "l"), client->getSocketFd());
+					return;
+				}
+				int limit = std::atoi(arg.c_str());
+				if (limit <= 0)
+				{
+					_srv->sendResponse(ERR_INVALIDMODEPARAM(client->getNickname(), channel->getName(), "l"), client->getSocketFd());
+					return;
+				}
+				channel->setLimit(limit);
+				break;
+			}
 		case 'k':
 			channel->setKey(arg); break;
 		case 'o':
