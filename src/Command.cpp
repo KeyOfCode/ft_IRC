@@ -6,7 +6,7 @@
 /*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/08 18:32:33 by darismen          #+#    #+#             */
-/*   Updated: 2026/02/10 13:28:42 by darismen         ###   ########.fr       */
+/*   Updated: 2026/02/24 13:35:05 by darismen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -321,6 +321,8 @@ void	Join::execute(Client* client, std::vector<std::string> args)
 		channel = new Channel(tgt_channel, key, client, _srv);
 		_srv->add_Channel(channel);
 		client->joinChannel(tgt_channel);
+		if (key != "")
+			channel->setMode('k', true);
 	}
 	else
 	{

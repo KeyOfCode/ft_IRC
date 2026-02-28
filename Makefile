@@ -35,6 +35,10 @@ test:
 	@make
 	./$(NAME) 1234 1234
 
+val:
+	@make
+	valgrind --leak-check=full --show-leak-kinds=all -s ./$(NAME) 6667 1234
+
 clean:
 	@echo "$(GREEN)Cleaning...$(RESET)"
 	@$(RM) $(OBJS)

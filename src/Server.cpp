@@ -6,7 +6,7 @@
 /*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/10 10:39:51 by paromero          #+#    #+#             */
-/*   Updated: 2026/02/24 12:03:26 by darismen         ###   ########.fr       */
+/*   Updated: 2026/02/24 13:35:05 by darismen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,8 +29,10 @@ Server::~Server()
 	for (std::map<int, Client*>::iterator it = clients_.begin(); 
 		 it != clients_.end(); ++it)
 	{
+		close(it->first);
 		delete it->second;
 	}
+	clients_.clear();
 	
 	// Clean up channels
 	for (std::set<Channel*>::iterator it = channels_.begin(); 
@@ -38,6 +40,7 @@ Server::~Server()
 	{
 		delete *it;
 	}
+	channels_.clear();
 }
 
 //MARK: Init
@@ -136,22 +139,24 @@ Channel*		Server::getChannel(std::string name)
 	for (; it != this->channels_.end(); it++)
 		if ((*it)->getName() == name)
 			return *it;
-	std::cout << "Channel does not exist" << std::endl;
+	// std::cout << "Channel does not exist" << std::endl;
 	return NULL;
 }
 
 //MARK: add_Channel
 void		Server::add_Channel(Channel * new_channel)
 {
-	if (this->getChannel(new_channel->getName()) == NULL)
+	if (this->getChannel(new_channel->getName()) == 0)
 		this->channels_.insert(new_channel);
 	else
-		std::cout << "Channel already exists" << std::endl;
+		delete new_channel;
+		// std::cout << "Channel already exists" << std::endl;
 }
 
 void	Server::del_Channel(Channel *channel)
 {
 	channels_.erase(channel);
+	delete channel;
 }
 
 /*
