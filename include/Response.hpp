@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
+/*   By: paluja <paluja@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/08 18:39:34 by darismen          #+#    #+#             */
-/*   Updated: 2026/02/10 13:21:47 by darismen         ###   ########.fr       */
+/*   Updated: 2026/02/26 19:36:21 by paluja           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,8 @@
 #define ERR_BADCHANMASK(source, channel)				"476: " + source + " " + channel + " :Bad Channel Mask"
 #define ERR_CANNOTSENDTOCHAN(source, channel)           "404: " + source + " " + channel + " :Cannot send to channel"
 #define ERR_CHANOPRIVSNEEDED(source, channel)           "482: " + source + " " + channel + " :You're not channel operator"
-#define ERR_UMODEUNKNOWNFLAG							"501: Unknown MODE flag"
+#define ERR_UMODEUNKNOWNFLAG(source, flag)			"501: " + source + " " + flag + " :Unknown MODE flag"
+#define ERR_INVALIDMODEPARAM(source, channel, mode)	"696: " + source + " " + channel + " " + mode + " :Invalid mode parameter"
 
 #define ERR_NOSUCHNICK(nickname)						"401: " + nickname + " :No such nick/channel"
 #define ERR_NOSUCHCHANNEL(channel)						"403: " + channel + " :No such channel"
