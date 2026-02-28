@@ -6,7 +6,7 @@
 /*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/08 18:32:33 by darismen          #+#    #+#             */
-/*   Updated: 2026/02/28 19:32:25 by darismen         ###   ########.fr       */
+/*   Updated: 2026/02/28 20:52:11 by darismen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -220,9 +220,13 @@ std::string get_active_modes(Channel *channel)
 
 // MARK: Mode
 // MODE <channel> <flags> [<args>]
-static const std::map<char, int> MODE_PARAMS = {
-	{'l', 1}, {'k', 1}, {'o', 1}
-};
+// modes = iklot
+// static const std::map<char, int> MODE_PARAMS = {
+// 	{'l', 1}, {'k', 1}, {'o', 1}
+// };
+
+// static const std::vector<char> PARAMS = {'l', 'k', 'o'};
+static const std::string PARAMS = "klo";
 
 void Mode::execute(Client* client, std::vector<std::string> args)
 {
@@ -230,6 +234,7 @@ void Mode::execute(Client* client, std::vector<std::string> args)
 		return void(_srv->sendResponse(ERR_NEEDMOREPARAMS(client->getNickname(), "MODE"), client->getSocketFd()));
 	
 	std::string tgt_channel = args[0];
+		
 	Channel* channel = _srv->getChannel(tgt_channel);
 	if (!channel)
 		return void(_srv->sendResponse(ERR_NOSUCHCHANNEL(tgt_channel), client->getSocketFd()));
@@ -241,9 +246,37 @@ void Mode::execute(Client* client, std::vector<std::string> args)
 		return void(_srv->sendResponse(RPL_CHANNELMODEIS(tgt_channel, get_active_modes(channel)), client->getSocketFd()));
 
 	// Process mode changes
-	bool adding = true;
+	std::string modes = args[1];
+	bool adding = (args[1][0] != '-');
+	
 	size_t arg_idx = 2;
-	for (size_t i = 0; i < args[1].length(); ++i)
+	for (size_t i = 1; i < modes.length(); ++i)
+	{
+		char mode_char = modes[i];
+		if (!channel->hasMode(mode_char))
+			_srv->sendResponse(ERR_INVALIDMODEPARAM(client->getNickname(), channel->getName(), std::string(1, mode_char)), client->getSocketFd());
+		else
+		{
+			channel->setMode(mode_char, adding);
+			std::string flag = std::string(1, modes[0]) + mode_char;
+			if (PARAMS.find(mode_char) != std::string::npos)
+			{
+				if (adding || mode_char == 'o')
+				{
+					if (arg_idx < args.size())
+						change_sub(client, channel, flag, args[arg_idx++]); 
+					else
+						_srv->sendResponse(ERR_NEEDMOREPARAMS(client->getNickname(), "MODE"), client->getSocketFd());
+				}
+				else
+					change_sub(client, channel, flag, "");
+			}
+			else
+				channel->broadcast(RPL_MODE(client, args[0], flag, ""));
+		}
+	}
+
+	/* for (size_t i = 0; i < args[1].length(); ++i)
 	{
 		char mode_char = args[1][i];
 		if (mode_char == '+') adding = true;
@@ -270,7 +303,7 @@ void Mode::execute(Client* client, std::vector<std::string> args)
 				channel->broadcast(RPL_MODE(client, args[0], flag, ""));
 			}
 		}
-	}
+	} */
 }
 
 void	Mode::change_sub(Client *client, Channel *channel, std::string mode, std::string arg)
@@ -280,22 +313,29 @@ void	Mode::change_sub(Client *client, Channel *channel, std::string mode, std::s
 	{
 		case 'l':
 			{
-				if (arg.empty() || !std::all_of(arg.begin(), arg.end(), ::isdigit))
+				if (mode[0] == '-')
+					channel->setLimit(100);
+				else
 				{
-					_srv->sendResponse(ERR_INVALIDMODEPARAM(client->getNickname(), channel->getName(), "l"), client->getSocketFd());
-					return;
+					for (char c : arg)
+						if (!std::isdigit(c))
+							return void(_srv->sendResponse(ERR_INVALIDMODEPARAM(client->getNickname(), channel->getName(), "l"), client->getSocketFd()));
+					int limit = std::atoi(arg.c_str());
+					if (limit <= 0)
+					{
+						_srv->sendResponse(ERR_INVALIDMODEPARAM(client->getNickname(), channel->getName(), "l"), client->getSocketFd());
+						return;
+					}
+					channel->setLimit(limit);
 				}
-				int limit = std::atoi(arg.c_str());
-				if (limit <= 0)
-				{
-					_srv->sendResponse(ERR_INVALIDMODEPARAM(client->getNickname(), channel->getName(), "l"), client->getSocketFd());
-					return;
-				}
-				channel->setLimit(limit);
 				break;
 			}
 		case 'k':
-			channel->setKey(arg); break;
+			if (mode[0] == '-')
+				channel->setKey("");
+			else
+				channel->setKey(arg);
+			break;
 		case 'o':
 			Client *candidate = channel->getClient(arg);
 			if (candidate != NULL)
