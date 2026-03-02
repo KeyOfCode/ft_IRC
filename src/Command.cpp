@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Command.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: paromero <paromero@student.42malaga.com    +#+  +:+       +#+        */
+/*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/08 18:32:33 by darismen          #+#    #+#             */
-/*   Updated: 2026/03/02 12:46:59 by paromero         ###   ########.fr       */
+/*   Updated: 2026/03/02 12:57:23 by darismen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,7 +128,7 @@ void Kick::execute(Client* client, std::vector<std::string> args)
 	if (!target)
 		return void(_srv->sendResponse(ERR_NOSUCHNICK(target_user), client->getSocketFd()));
 	if (!channel->getClient(target_user))
-		return void(_srv->sendResponse(ERR_NOTONCHANNEL(client->getNickname(), tgt_channel), client->getSocketFd()));
+		return void(_srv->sendResponse(ERR_NOTONCHANNEL(target->getNickname(), tgt_channel), client->getSocketFd()));
 	if (channel->isClientAdmin(target))
 		if (target == channel->getAdminList()[0])
 			return void(_srv->sendResponse("Can't kick og_admin", client->getSocketFd()));
