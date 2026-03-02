@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Parser.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: paromero <paromero@student.42malaga.com    +#+  +:+       +#+        */
+/*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/19 16:52:12 by darismen          #+#    #+#             */
-/*   Updated: 2026/03/02 10:45:15 by paromero         ###   ########.fr       */
+/*   Updated: 2026/03/02 11:57:50 by darismen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,15 +52,17 @@ const std::map<std::string, Command *>& Parser::getCommands() const { return _co
 void	invoke(Server *srv, Parser *prs, Client* client, std::string command,
 		std::vector<std::string> params)
 {
-		if (!client->getPass() && command != "PASS")
+		if (command == "CAP")
+			;
+		else if (!client->getPass() && command != "PASS")
 			return void(srv->sendResponse("Need PASS", client->getSocketFd()));
-		if ((client->getNickname().empty() || client->getUsername().empty()) && (command != "NICK" && command != "USER" && command != "PASS" && command != "234")) //! code 234 is equal to Servlist, command passed when we pass the password
+		else if ((client->getNickname().empty() || client->getUsername().empty()) && (command != "NICK" && command != "USER" && command != "PASS" && command != "234")) //! code 234 is equal to Servlist, command passed when we pass the password
 			return void(srv->sendResponse("Need User/Nickname", client->getSocketFd()));
 		const std::map<std::string, Command*>& commands = prs->getCommands();
-		if (command == "302")
-			command = "USERHOST";
-		if (command == "234")
-			command = "SERVLIST";
+		// if (command == "302")
+		// 	command = "USERHOST";
+		// if (command == "234")
+		// 	command = "SERVLIST";
 		std::map<std::string, Command*>::const_iterator it = commands.find(command);
 		if (it == commands.end())
 			return void(srv->sendResponse(ERR_UNKNOWNCOMMAND(client->getNickname(), command), client->getSocketFd()));

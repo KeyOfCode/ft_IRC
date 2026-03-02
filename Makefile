@@ -28,16 +28,18 @@ $(OBJ_DIR)/%.o: %.cpp | $(OBJ_DIR)
 $(OBJ_DIR):
 	@mkdir -p $(OBJ_DIR)
 
+PASSWORD = 2476
+
 exe:
 	@make
-	./$(NAME) 6667 1234
+	./$(NAME) 6667 $(PASSWORD)
 test:
 	@make
 	./$(NAME) 1234 1234
 
 val:
 	@make
-	valgrind --leak-check=full --show-leak-kinds=all -s ./$(NAME) 6667 1234
+	valgrind --leak-check=full --show-leak-kinds=all -s ./$(NAME) 6667 $(PASSWORD)
 
 clean:
 	@echo "$(GREEN)Cleaning...$(RESET)"

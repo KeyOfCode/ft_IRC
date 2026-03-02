@@ -53,10 +53,10 @@ This project implements the core functionality of an IRC server, allowing multip
 
 Contains all numeric replies, explains the syntax and behaviour of each command.
 
-[RFC 1459](https://datatracker.ietf.org/doc/html/rfc1459)
-[RFC 2810](https://datatracker.ietf.org/doc/html/rfc2810)
-[RFC 2811](https://datatracker.ietf.org/doc/html/rfc2811)
-[RFC 2812](https://datatracker.ietf.org/doc/html/rfc2812)
-[RFC 2813](https://datatracker.ietf.org/doc/html/rfc2813)
-[RFC 7194](https://datatracker.ietf.org/doc/html/rfc7194)
+* [RFC 1459](https://datatracker.ietf.org/doc/html/rfc1459) Original IRC Protocol (1993)
+* [RFC 2810](https://datatracker.ietf.org/doc/html/rfc2810) IRC Architecture (2000)
+* [RFC 2811](https://datatracker.ietf.org/doc/html/rfc2811) IRC Channel Management (2000)
+* [RFC 2812](https://datatracker.ietf.org/doc/html/rfc2812) IRC Client Protocol (2000)
+* [RFC 2813](https://datatracker.ietf.org/doc/html/rfc2813) IRC Server Protocol (2000)
+* [RFC 7194](https://datatracker.ietf.org/doc/html/rfc7194) Default Port for IRC via TLS/SSL
 

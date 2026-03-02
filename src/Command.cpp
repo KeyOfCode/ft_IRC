@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Command.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: paromero <paromero@student.42malaga.com    +#+  +:+       +#+        */
+/*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/08 18:32:33 by darismen          #+#    #+#             */
-/*   Updated: 2026/03/02 10:49:32 by paromero         ###   ########.fr       */
+/*   Updated: 2026/03/02 12:17:23 by darismen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,10 @@ void Pass::execute(Client* client, std::vector<std::string> args)
 	if (_srv->getpassword() != key)
 		_srv->close_client(client->getSocketFd(), "Wrong Password");
 	else
+	{
 		client->setPassOK();
+		_srv->sendResponse(RPL_SERVLIST, client->getSocketFd());	
+	}
 	
 }
 //MARK: Who
@@ -268,6 +271,7 @@ void Mode::execute(Client* client, std::vector<std::string> args)
 					if (arg_idx < args.size())
 						change_sub(client, channel, flag, args[arg_idx++]); 
 					else
+						channel->setMode(mode_char, false);
 						_srv->sendResponse(ERR_NEEDMOREPARAMS(client->getNickname(), "MODE"), client->getSocketFd());
 				}
 				else
@@ -277,35 +281,6 @@ void Mode::execute(Client* client, std::vector<std::string> args)
 				channel->broadcast(RPL_MODE(client, args[0], flag, ""));
 		}
 	}
-
-	/* for (size_t i = 0; i < args[1].length(); ++i)
-	{
-		char mode_char = args[1][i];
-		if (mode_char == '+') adding = true;
-		else if (mode_char == '-') adding = false;
-		else if (!channel->hasMode(mode_char))
-			_srv->sendResponse(ERR_INVALIDMODEPARAM(client->getNickname(), channel->getName(), std::string(1, mode_char)), client->getSocketFd());
-		else 
-		{
-			std::string flag = std::string(1, adding ? '+' : '-') + mode_char;
-			if (MODE_PARAMS.count(mode_char))
-			{
-				if (arg_idx < args.size())
-				{
-					channel->setMode(mode_char, adding);
-					change_sub(client, channel, flag, args[arg_idx++]); 
-					// channel->broadcast(RPL_MODE(client, args[0], flag, args[arg_idx++]));
-				}
-				else
-					_srv->sendResponse(ERR_NEEDMOREPARAMS(client->getNickname(), "MODE"), client->getSocketFd());
-			}
-			else
-			{
-				channel->setMode(mode_char, adding);
-				channel->broadcast(RPL_MODE(client, args[0], flag, ""));
-			}
-		}
-	} */
 }
 
 void	Mode::change_sub(Client *client, Channel *channel, std::string mode, std::string arg)
@@ -324,10 +299,7 @@ void	Mode::change_sub(Client *client, Channel *channel, std::string mode, std::s
 							return void(_srv->sendResponse(ERR_INVALIDMODEPARAM(client->getNickname(), channel->getName(), "l"), client->getSocketFd()));
 					int limit = std::atoi(arg.c_str());
 					if (limit <= 0)
-					{
-						_srv->sendResponse(ERR_INVALIDMODEPARAM(client->getNickname(), channel->getName(), "l"), client->getSocketFd());
-						return;
-					}
+						return void(_srv->sendResponse(ERR_INVALIDMODEPARAM(client->getNickname(), channel->getName(), "l"), client->getSocketFd()));
 					channel->setLimit(limit);
 				}
 				break;
