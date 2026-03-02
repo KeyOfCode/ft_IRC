@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Command.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
+/*   By: paromero <paromero@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/08 18:32:33 by darismen          #+#    #+#             */
-/*   Updated: 2026/02/28 20:52:11 by darismen         ###   ########.fr       */
+/*   Updated: 2026/03/02 10:49:32 by paromero         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,8 @@ void Pass::execute(Client* client, std::vector<std::string> args)
 
 	if (_srv->getpassword() != key)
 		_srv->close_client(client->getSocketFd(), "Wrong Password");
+	else
+		client->setPassOK();
 	
 }
 //MARK: Who
