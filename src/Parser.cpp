@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Parser.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
+/*   By: paromero <paromero@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/19 16:52:12 by darismen          #+#    #+#             */
-/*   Updated: 2026/02/10 12:40:17 by darismen         ###   ########.fr       */
+/*   Updated: 2026/03/02 10:45:15 by paromero         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,8 +52,10 @@ const std::map<std::string, Command *>& Parser::getCommands() const { return _co
 void	invoke(Server *srv, Parser *prs, Client* client, std::string command,
 		std::vector<std::string> params)
 {
-		if (!client->getPass())
+		if (!client->getPass() && command != "PASS")
 			return void(srv->sendResponse("Need PASS", client->getSocketFd()));
+		if ((client->getNickname().empty() || client->getUsername().empty()) && (command != "NICK" && command != "USER" && command != "PASS" && command != "234")) //! code 234 is equal to Servlist, command passed when we pass the password
+			return void(srv->sendResponse("Need User/Nickname", client->getSocketFd()));
 		const std::map<std::string, Command*>& commands = prs->getCommands();
 		if (command == "302")
 			command = "USERHOST";
