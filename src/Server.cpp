@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
+/*   By: paromero <paromero@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/10 10:39:51 by paromero          #+#    #+#             */
-/*   Updated: 2026/02/24 13:35:05 by darismen         ###   ########.fr       */
+/*   Updated: 2026/03/02 10:44:40 by paromero         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -245,26 +245,26 @@ void	Server::handle_read(int fd) {
 	
 	client->appendToRecvBuffer(data);
 	// ! password management
-	if (!client->getPass()) {	
-		if (client->getRecvBuffer().find("PASS") != std::string::npos) {
-			std::string line = client->getRecvBuffer();
-			size_t firstpos = line.find("PASS") + 5; //! We pass the word PASS and the space to focus in the password
-			size_t finalpos = line.find('\r', firstpos);
+	// if (!client->getPass()) {	
+	// 	if (client->getRecvBuffer().find("PASS") != std::string::npos) {
+	// 		std::string line = client->getRecvBuffer();
+	// 		size_t firstpos = line.find("PASS") + 5; //! We pass the word PASS and the space to focus in the password
+	// 		size_t finalpos = line.find('\r', firstpos);
 			
-			if (finalpos == std::string::npos)
-				return void(close_client(fd, "Empty Pass"));
-			finalpos = finalpos - firstpos;
-			std::string password = line.substr(firstpos, finalpos);
-			if (password != this->pswd_) {
-				close_client(fd, "Wrong password");
-				return;
-			}
-			else {
-				client->setPassOK();
-				client->popRecv(finalpos + 2);
-			}
-		}
-	}
+	// 		if (finalpos == std::string::npos)
+	// 			return void(close_client(fd, "Empty Pass"));
+	// 		finalpos = finalpos - firstpos;
+	// 		std::string password = line.substr(firstpos, finalpos);
+	// 		if (password != this->pswd_) {
+	// 			close_client(fd, "Wrong password");
+	// 			return;
+	// 		}
+	// 		else {
+	// 			client->setPassOK();
+	// 			client->popRecv(finalpos + 2);
+	// 		}
+	// 	}
+	// }
 	std::cout << "Message from client: " << client->getRecvBuffer() << std::endl;
 	std::cout << "returned recv: " << n << std::endl;
 	client->processBuffer(this, parser_, invoke);
