@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
+/*   By: paromero <paromero@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/09 14:05:47 by darismen          #+#    #+#             */
-/*   Updated: 2026/02/24 13:28:11 by darismen         ###   ########.fr       */
+/*   Updated: 2026/03/02 12:45:23 by paromero         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,7 +116,6 @@ Client*	Channel::getClient(std::string client)
 		if ((*it)->getNickname() == client)
 			return *it;
 
-	// std::cout << "Client is not member" << std::endl;
 	log(client + " is not member of " + _name);
 	return NULL;
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Parser.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
+/*   By: paromero <paromero@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/19 16:52:12 by darismen          #+#    #+#             */
-/*   Updated: 2026/03/02 11:57:50 by darismen         ###   ########.fr       */
+/*   Updated: 2026/03/02 12:46:38 by paromero         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,6 @@ Parser::Parser(Server* srv) : _srv(srv)
 	
 	_commands["CAP"] = new Cap(_srv);
 	_commands["PASS"] = new Pass(_srv);
-	_commands["SERVLIST"] = new Servlist(_srv);
 	_commands["USERHOST"] = new Userhost(_srv);
 	
 	_commands["JOIN"] = new Join(_srv);
@@ -59,10 +58,6 @@ void	invoke(Server *srv, Parser *prs, Client* client, std::string command,
 		else if ((client->getNickname().empty() || client->getUsername().empty()) && (command != "NICK" && command != "USER" && command != "PASS" && command != "234")) //! code 234 is equal to Servlist, command passed when we pass the password
 			return void(srv->sendResponse("Need User/Nickname", client->getSocketFd()));
 		const std::map<std::string, Command*>& commands = prs->getCommands();
-		// if (command == "302")
-		// 	command = "USERHOST";
-		// if (command == "234")
-		// 	command = "SERVLIST";
 		std::map<std::string, Command*>::const_iterator it = commands.find(command);
 		if (it == commands.end())
 			return void(srv->sendResponse(ERR_UNKNOWNCOMMAND(client->getNickname(), command), client->getSocketFd()));

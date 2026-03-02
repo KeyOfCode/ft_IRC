@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Command.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
+/*   By: paromero <paromero@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/19 15:58:30 by darismen          #+#    #+#             */
-/*   Updated: 2026/02/10 12:24:15 by darismen         ###   ########.fr       */
+/*   Updated: 2026/03/02 12:47:16 by paromero         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,15 +44,6 @@ class Cap : public Command
 	public:
 		Cap(Server *srv) : Command(srv) {}
 		~Cap() {}
-		void execute(Client* client, std::vector<std::string> args);
-};
-
-//MARK: Servlist
-class Servlist : public Command
-{
-	public:
-		Servlist(Server *srv) : Command(srv) {}
-		~Servlist() {}
 		void execute(Client* client, std::vector<std::string> args);
 };
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Command.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: darismen <darismen@student.42.fr>          +#+  +:+       +#+        */
+/*   By: paromero <paromero@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/08 18:32:33 by darismen          #+#    #+#             */
-/*   Updated: 2026/03/02 12:17:23 by darismen         ###   ########.fr       */
+/*   Updated: 2026/03/02 12:46:59 by paromero         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,12 +42,6 @@ void Cap::execute(Client* client, std::vector<std::string> args)
 		_srv->sendResponse(":server CAP * NAK :" + (args.size() > 1 ? args[1] : ""), client->getSocketFd());
 	}
 }
-//MARK: Servlist
-void Servlist::execute(Client* client, std::vector<std::string> args)
-{
-	(void)args;
-	_srv->sendResponse(RPL_SERVLIST, client->getSocketFd());
-}
 //MARK: Userhost
 void Userhost::execute(Client* client, std::vector<std::string> args)
 {
@@ -73,7 +67,7 @@ void Pass::execute(Client* client, std::vector<std::string> args)
 	std::string key = args[0];
 
 	if (_srv->getpassword() != key)
-		_srv->close_client(client->getSocketFd(), "Wrong Password");
+		_srv->sendResponse(ERR_PASSWDMISMATCH(client->getNickname()), client->getSocketFd());	
 	else
 	{
 		client->setPassOK();
@@ -270,9 +264,10 @@ void Mode::execute(Client* client, std::vector<std::string> args)
 				{
 					if (arg_idx < args.size())
 						change_sub(client, channel, flag, args[arg_idx++]); 
-					else
+					else {
 						channel->setMode(mode_char, false);
 						_srv->sendResponse(ERR_NEEDMOREPARAMS(client->getNickname(), "MODE"), client->getSocketFd());
+					}
 				}
 				else
 					change_sub(client, channel, flag, "");

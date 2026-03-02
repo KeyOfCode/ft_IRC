@@ -6,7 +6,7 @@
 /*   By: paromero <paromero@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/10 10:39:51 by paromero          #+#    #+#             */
-/*   Updated: 2026/03/02 10:44:40 by paromero         ###   ########.fr       */
+/*   Updated: 2026/03/02 12:45:54 by paromero         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,7 +99,8 @@ std::string	Server::getpassword() {
 //MARK: handle_signal
 void	Server::handle_signal(int sig) {
 	(void)sig;
-	std::cout << std::endl << "Signal detected, exiting..." << std::endl;
+	std::cout << std::endl;
+	log("Signal detected, exiting...");
 	Server::signal_ = true;
 }
 
@@ -139,7 +140,6 @@ Channel*		Server::getChannel(std::string name)
 	for (; it != this->channels_.end(); it++)
 		if ((*it)->getName() == name)
 			return *it;
-	// std::cout << "Channel does not exist" << std::endl;
 	return NULL;
 }
 
@@ -150,7 +150,6 @@ void		Server::add_Channel(Channel * new_channel)
 		this->channels_.insert(new_channel);
 	else
 		delete new_channel;
-		// std::cout << "Channel already exists" << std::endl;
 }
 
 void	Server::del_Channel(Channel *channel)
@@ -244,27 +243,6 @@ void	Server::handle_read(int fd) {
 	std::cout << "Received " << n << " bytes from fd " << fd << std::endl;
 	
 	client->appendToRecvBuffer(data);
-	// ! password management
-	// if (!client->getPass()) {	
-	// 	if (client->getRecvBuffer().find("PASS") != std::string::npos) {
-	// 		std::string line = client->getRecvBuffer();
-	// 		size_t firstpos = line.find("PASS") + 5; //! We pass the word PASS and the space to focus in the password
-	// 		size_t finalpos = line.find('\r', firstpos);
-			
-	// 		if (finalpos == std::string::npos)
-	// 			return void(close_client(fd, "Empty Pass"));
-	// 		finalpos = finalpos - firstpos;
-	// 		std::string password = line.substr(firstpos, finalpos);
-	// 		if (password != this->pswd_) {
-	// 			close_client(fd, "Wrong password");
-	// 			return;
-	// 		}
-	// 		else {
-	// 			client->setPassOK();
-	// 			client->popRecv(finalpos + 2);
-	// 		}
-	// 	}
-	// }
 	std::cout << "Message from client: " << client->getRecvBuffer() << std::endl;
 	std::cout << "returned recv: " << n << std::endl;
 	client->processBuffer(this, parser_, invoke);
@@ -315,7 +293,9 @@ void	Server::handle_write(int fd) {
 
 //MARK: close_client
 void	Server::close_client(int fd, std::string reason) {
-	std::cout << "Closing client " << fd << " because of : " << reason << std::endl;
+	std::ostringstream response;
+	response << "Closing client " << fd << " because of : " << reason;
+	log(response.str());
 
 	Client *cli = this->getclient(fd);
 	std::set<Channel *> channel_list = this->get_all_Channels();
